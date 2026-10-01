@@ -1,0 +1,880 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+@font-face{font-family:"Schibsted Grotesk";src:url("assets/fonts/SchibstedGrotesk-Variable.woff2") format("woff2");font-weight:400 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Martian Mono";src:url("assets/fonts/MartianMono-Variable.woff2") format("woff2");font-weight:100 800;font-style:normal;font-display:swap}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:"Schibsted Grotesk","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img,svg,canvas{display:block;max-width:100%}
+p,h1,h2,h3,ul,ol,dl,dd,figure{margin:0}
+ul,ol{padding:0;list-style:none}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid #C62828;outline-offset:3px}
+.pistes{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:999;display:flex;gap:2px;padding:4px;background:#1D1A18;border-radius:999px;font:500 12px/1 "Martian Mono",Menlo,monospace;box-shadow:0 8px 28px rgba(29,26,24,.28);max-width:calc(100vw - 24px)}
+.pistes a{color:#C9C1B9;text-decoration:none;padding:9px 13px;border-radius:999px;white-space:nowrap}
+.pistes a:hover{color:#FFFFFF}
+.pistes a[aria-current="page"]{background:#FC3030;color:#FFFFFF}
+@media (max-width:640px){.pistes{font-size:11px}.pistes a{padding:8px 9px}.pistes .long{display:none}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+<title>DATA SCALE — Cabinet data, cloud et IA, du cadrage au run</title>
+<meta name="description" content="DATA SCALE cadre, construit et opère les plateformes cloud, data et IA des ETI et des grands groupes : au forfait, en centre de services ou en renfort.">
+<link rel="canonical" href="https://datascale.fr/">
+<meta name="theme-color" content="#FFFFFF">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="DATA SCALE">
+<meta property="og:title" content="DATA SCALE — Data, cloud et IA, du cadrage au run">
+<meta property="og:description" content="Nous cadrons, construisons et opérons les plateformes cloud, data et IA des ETI et des grands groupes.">
+<meta property="og:url" content="https://datascale.fr/">
+<meta property="og:image" content="https://datascale.fr/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"DATA SCALE","legalName":"DATA SCALE SASU","url":"https://datascale.fr/","logo":"https://datascale.fr/assets/img/datascale-logo-horizontal-rouge.svg","foundingDate":"2022","founder":{"@type":"Person","name":"Samy Bouchikhi"},"email":"samy.bouchikhi@datascale.fr","sameAs":["https://www.linkedin.com/company/datascalefr/"],"address":{"@type":"PostalAddress","addressRegion":"Oise","addressCountry":"FR"},"identifier":{"@type":"PropertyValue","propertyID":"SIREN","value":"952569580"},"areaServed":"FR","slogan":"Data, cloud et IA, du cadrage au run."}</script>
+<style>
+/* DATA SCALE · datascale.fr
+   Fond papier. Deux acteurs : le champ de particules (accueil, démarche, contact) et le schéma vivant de la plateforme
+   en quatre couches (fondations, plateforme cloud, données, IA et usages), tenue en run. Aucun nom d'outil dans les visuels. */
+:root{--papier:#FFFFFF;--brume:#F6F4F1;--encre:#1D1A18;--graphite:#4E4844;--pierre:#6B645E;--gris:#A39B94;--galet:#CFC8C1;--filet:#E6E1DC;
+  --bordure:#8A837C;--rouge:#FC3030;--carmin:#C62828;--carmin-profond:#9C1F1F;--carmin-teinte:#FCEEED;--ok:#1F7A4D;--marge:clamp(16px,4.4vw,64px)}
+html{background:var(--papier);scroll-padding-top:80px;overflow-x:clip}
+body{background:var(--papier);color:var(--encre);overflow-x:hidden}
+.logo{height:30px;width:auto}
+.logo .logo-nuage,.logo .logo-mot{fill:var(--rouge)}
+.lu{width:22px;height:22px;flex:none}
+#field{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:0;pointer-events:none}
+.labels{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.labels span{position:absolute;left:0;top:0;font:500 12px/1 "Martian Mono",Menlo,monospace;color:var(--graphite);white-space:nowrap;opacity:0;transition:opacity .6s,color .4s;background:rgba(255,255,255,.85);padding:4px 6px;border-radius:2px}
+.labels span.on{opacity:1}
+.labels span.red{color:var(--carmin);font-weight:700}
+main,footer{position:relative;z-index:2}
+
+/* en-tête */
+.hd{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:24px;padding:18px var(--marge);transition:transform .5s cubic-bezier(.2,.7,.2,1),background .35s,box-shadow .35s}
+.hd.away{transform:translateY(-110%)}
+.hd.scrolled{background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 1px 0 var(--filet)}
+.brand{display:inline-flex;text-decoration:none}
+.hd nav{margin-left:auto;display:flex;align-items:center;gap:28px}
+.hd nav a:not(.btn){text-decoration:none;font-weight:500;font-size:15px}
+.hd nav a:not(.btn):hover{color:var(--carmin)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:50px;padding:0 26px;border-radius:2px;font-weight:600;font-size:15px;text-decoration:none;white-space:nowrap;transition:background .2s,color .2s,box-shadow .2s}
+.btn-red{background:var(--carmin);color:#FFFFFF}
+.btn-red:hover{background:var(--carmin-profond)}
+.btn-line{box-shadow:inset 0 0 0 1.5px var(--encre);color:var(--encre);background:rgba(255,255,255,.75)}
+.btn-line:hover{background:var(--encre);color:#FFFFFF}
+.hd .btn{height:42px;padding:0 18px;font-size:14px}
+@media (max-width:860px){.hd nav a:not(.btn){display:none}}
+
+/* accueil */
+.hero{min-height:100svh;display:flex;align-items:center;padding:120px var(--marge) 96px}
+.hero-text{width:min(47vw,680px)}
+h1{font-size:clamp(58px,8.6vw,148px);line-height:.9;font-weight:800;letter-spacing:-.055em}
+h1 .kick{display:block;font-size:clamp(22px,2vw,32px);line-height:1.1;letter-spacing:-.02em;font-weight:700;margin-bottom:.35em}
+h1 .ln{display:block;width:fit-content;overflow:hidden;padding-bottom:.1em;margin-bottom:-.1em}
+h1 .ln>span{display:block}
+h1 .lt{font-weight:800}
+.lead{margin-top:30px;font-size:clamp(18px,1.4vw,21px);line-height:1.45;color:var(--graphite);max-width:27em}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
+@media (max-width:760px){.hero{align-items:flex-end;padding-bottom:72px}.hero-text{width:100%}}
+
+/* démarche */
+.steps{height:100vh;position:relative}
+.steps-in{height:100vh;display:flex;align-items:center;padding:96px var(--marge);position:relative}
+.steps-text{position:relative;width:min(40vw,540px);height:min(460px,64vh)}
+.step{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:18px;opacity:0;visibility:hidden}
+.step.on{opacity:1;visibility:visible}
+.step-k{font:500 13px/1 "Martian Mono",Menlo,monospace;color:var(--carmin)}
+.step h2{font-size:clamp(34px,3.8vw,60px);line-height:.98;font-weight:800;letter-spacing:-.04em;text-wrap:balance}
+.step p{font-size:18px;line-height:1.5;color:var(--graphite);max-width:30em}
+.step ul{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.step li{font-size:14px;font-weight:600;padding:8px 12px;background:var(--brume);border-radius:2px}
+.dots{position:absolute;left:var(--marge);bottom:48px;display:flex;gap:10px}
+.dots i{width:48px;height:3px;background:var(--filet);position:relative;overflow:hidden}
+.dots b{position:absolute;inset:0;background:var(--carmin);transform:scaleX(0);transform-origin:left}
+@media (max-width:760px){.steps-in{align-items:flex-end;padding-bottom:88px}.steps-text{width:100%;height:340px}.step h2{font-size:32px}.step p{font-size:16px}.dots{bottom:48px}}
+body.static .steps,body.static .steps-in{height:auto}
+body.static .steps-text{height:auto;width:min(100%,640px);display:grid;gap:56px}
+body.static .step{position:static;transform:none;opacity:1;visibility:visible}
+body.static .dots{display:none}
+
+/* sections pleines */
+.sec{position:relative;padding:clamp(96px,12vw,170px) var(--marge)}
+.sec-head{display:grid;gap:18px;max-width:900px}
+.sec-title{font-size:clamp(40px,5.2vw,84px);line-height:.96;font-weight:800;letter-spacing:-.045em;text-wrap:balance}
+.sec-lead{font-size:19px;line-height:1.5;color:var(--graphite);max-width:36em}
+
+/* plateforme vivante */
+.plat{background:var(--brume)}
+.plat-grid{margin-top:56px;display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(24px,4vw,64px);align-items:start}
+.console{position:relative;background:var(--papier);border:1px solid var(--galet);border-radius:6px;box-shadow:0 30px 80px -30px rgba(29,26,24,.25),0 2px 0 var(--filet);will-change:transform}
+.console-bar{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--filet);font:500 12px/1 "Martian Mono",Menlo,monospace;color:var(--pierre)}
+.console-bar b{color:var(--encre);font-weight:600}
+.console-bar span:last-child{margin-left:auto}
+.dia{display:block;width:100%;height:auto;padding:10px 12px 6px}
+.status{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:center;padding:12px 16px;border-top:1px solid var(--filet);font:500 12px/1.3 "Martian Mono",Menlo,monospace;color:var(--pierre);transition:background .4s,box-shadow .4s}
+.status strong{color:var(--encre);font-weight:600;font-variant-numeric:tabular-nums}
+.status .ok{display:inline-flex;align-items:center;gap:8px;color:var(--ok);font-weight:600}
+.status .ok i{width:8px;height:8px;border-radius:999px;background:var(--ok);animation:ping 2s infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(31,122,77,.45)}70%{box-shadow:0 0 0 8px rgba(31,122,77,0)}100%{box-shadow:0 0 0 0 rgba(31,122,77,0)}}
+.console.run .status{background:var(--carmin-teinte);box-shadow:inset 0 2px 0 var(--carmin)}
+
+.dia .g{transition:opacity .5s}
+.dia .band{fill:var(--brume);stroke:transparent;stroke-width:1.5;transition:fill .4s,stroke .4s}
+.dia .bl{font:500 10.5px "Martian Mono",Menlo,monospace;fill:var(--pierre);transition:fill .4s}
+.dia .brick{fill:#FFFFFF;stroke:var(--bordure);stroke-width:1;transition:stroke .25s,stroke-width .25s}
+.dia .brick.hit{stroke:var(--carmin);stroke-width:2.5}
+.dia .nm{font:600 12.5px "Schibsted Grotesk",Arial,sans-serif;fill:var(--encre);text-anchor:middle}
+.dia .hdr{font:500 10.5px "Martian Mono",Menlo,monospace;fill:var(--pierre)}
+.dia .flow{fill:none;stroke:var(--graphite);stroke-width:1.5}
+.dia .pst circle{fill:var(--carmin)}
+.dia .pst text{font:700 10.5px "Schibsted Grotesk",Arial,sans-serif;fill:#FFFFFF;text-anchor:middle;dominant-baseline:central}
+.dia .led{fill:var(--galet);transition:fill .3s}
+.dia .led.on{fill:var(--ok)}
+.dia .pk{fill:var(--carmin)}
+.dia #pk{transition:opacity .4s}
+.dia[data-focus="cloud"] .g:not(.g-cloud):not(.g-fond){opacity:.16}
+.dia[data-focus="cloud"] #pk{opacity:.15}
+.dia[data-focus="data"] .g:not(.g-src):not(.g-data){opacity:.16}
+.dia[data-focus="ia"] .g:not(.g-ia):not(.g-riser){opacity:.16}
+.dia[data-focus="cloud"] .g-cloud .band,.dia[data-focus="cloud"] .g-fond .band,.dia[data-focus="data"] .g-data .band,.dia[data-focus="ia"] .g-ia .band{fill:var(--carmin-teinte);stroke:var(--carmin);stroke-dasharray:6 5}
+.dia[data-focus="cloud"] .g-cloud .bl,.dia[data-focus="cloud"] .g-fond .bl,.dia[data-focus="data"] .g-data .bl,.dia[data-focus="ia"] .g-ia .bl{fill:var(--carmin)}
+.dia[data-focus="run"] .led{fill:var(--ok)}
+
+.tabs{display:flex;flex-wrap:wrap;gap:4px;padding:4px;background:#FFFFFF;box-shadow:inset 0 0 0 1px var(--filet);border-radius:999px;width:max-content;max-width:100%}
+.tabs button{all:unset;cursor:pointer;padding:11px 20px;border-radius:999px;font-weight:600;font-size:15px;color:var(--graphite);transition:background .25s,color .25s}
+.tabs button:hover{color:var(--encre)}
+.tabs button[aria-selected="true"]{background:var(--encre);color:#FFFFFF}
+.tabs button:focus-visible{outline:2px solid var(--carmin);outline-offset:2px}
+.tab-prog{height:2px;background:var(--filet);margin-top:18px;overflow:hidden}
+.tab-prog i{display:block;height:100%;background:var(--carmin);transform-origin:left;transform:scaleX(0)}
+.tab-prog i.run{animation:grow 6s linear forwards}
+.tab-prog.stop i{animation:none;transform:scaleX(0)}
+@keyframes grow{to{transform:scaleX(1)}}
+.pane{display:none;margin-top:26px}
+.pane.on{display:grid;gap:14px}
+.pane h3{font-size:clamp(28px,2.6vw,40px);line-height:1.02;font-weight:800;letter-spacing:-.035em;text-wrap:balance}
+.pane p{font-size:17px;line-height:1.5;color:var(--graphite)}
+.offers{margin-top:8px;border-top:2px solid var(--encre)}
+.offers li{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:12px 0;border-bottom:1px solid var(--filet);font-weight:600;font-size:15px;line-height:1.35}
+.offers li span{font:500 11px/1.6 "Martian Mono",Menlo,monospace;color:var(--pierre);text-align:right;flex:none}
+@media (max-width:960px){.plat-grid{grid-template-columns:1fr}.console-bar span:last-child,.status .x{display:none}}
+.plat{will-change:clip-path}
+
+/* modes d'engagement */
+.modes{background:var(--papier)}
+.modes-grid{margin-top:56px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(20px,3vw,48px)}
+.mode{position:relative;display:grid;gap:14px;align-content:start;padding-top:26px;border-top:2px solid var(--encre)}
+.mode::before{content:"";position:absolute;left:0;top:-2px;height:2px;width:100%;background:var(--carmin);transform:scaleX(0);transform-origin:left;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.mode:hover::before{transform:scaleX(1)}
+.mode .ic{width:48px;height:48px;display:grid;place-items:center;background:var(--carmin-teinte);color:var(--carmin);border-radius:4px}
+.mode h3{font-size:clamp(26px,2.4vw,36px);line-height:1;font-weight:800;letter-spacing:-.035em}
+.mode p{font-size:17px;line-height:1.5;color:var(--graphite)}
+.modes-note{margin-top:48px;font-size:17px;line-height:1.5;color:var(--graphite);max-width:40em}
+@media (max-width:900px){.modes-grid{grid-template-columns:1fr}}
+
+/* références */
+.refs{background:var(--papier)}
+.refs{padding-left:0;padding-right:0;overflow:hidden}
+.refs .sec-head,.refs .refs-note{padding-inline:var(--marge)}
+.kin{margin-top:56px;display:grid;gap:2px}
+.kin-row{display:flex;width:max-content;white-space:nowrap;will-change:transform}
+.kin-row span{display:inline-flex;align-items:center;gap:.36em;padding-right:.36em;font-size:clamp(52px,8.6vw,146px);line-height:1.08;font-weight:800;letter-spacing:-.055em}
+.kin-row span::after{content:"";width:.15em;height:.15em;background:var(--rouge);flex:none}
+.kin-row.out span{color:transparent;-webkit-text-stroke:1.5px var(--encre)}
+.refs-note{margin-top:32px;font-size:14px;color:var(--pierre)}
+
+/* intro : la graduation se remplit, puis ses points forment le nuage */
+.intro{position:fixed;inset:0;z-index:200;display:none;place-items:center;background:var(--papier)}
+.js-intro .intro{display:grid}
+.intro-in{width:min(64vw,760px);display:grid;gap:16px}
+.intro-n{font:500 clamp(44px,6.4vw,96px)/1 "Martian Mono",Menlo,monospace;letter-spacing:-.05em;font-variant-numeric:tabular-nums;color:var(--encre)}
+.intro-ruler{position:relative;height:18px;border-right:1px solid var(--encre);
+  background-image:linear-gradient(var(--encre),var(--encre)),repeating-linear-gradient(to right,var(--encre) 0 1px,transparent 1px 25%),repeating-linear-gradient(to right,var(--galet) 0 1px,transparent 1px 2.5%);
+  background-size:100% 1px,100% 18px,100% 8px;background-position:left bottom,left bottom,left bottom;background-repeat:no-repeat}
+.intro-ruler i{position:absolute;left:0;bottom:0;width:100%;height:4px;background:var(--carmin);transform-origin:left;transform:scaleX(0)}
+.intro-l{display:flex;justify-content:space-between;font:500 12px/1 "Martian Mono",Menlo,monospace;color:var(--pierre)}
+
+/* curseur, onde de choc, mots révélés, balayage du schéma */
+.cur{position:fixed;left:0;top:0;z-index:150;pointer-events:none;border-radius:999px;opacity:0;transition:opacity .3s,width .35s,height .35s,margin .35s,border-color .3s,background .3s}
+.cur-dot{width:6px;height:6px;margin:-3px 0 0 -3px;background:var(--carmin)}
+.cur-ring{width:40px;height:40px;margin:-20px 0 0 -20px;border:1.5px solid var(--encre)}
+body.has-cur .cur{opacity:1}
+body.cur-big .cur-ring{width:78px;height:78px;margin:-39px 0 0 -39px;border-color:var(--carmin);background:rgba(198,40,40,.06)}
+@media (hover:none),(prefers-reduced-motion:reduce){.cur{display:none}}
+.shock{position:fixed;z-index:3;left:0;top:0;width:24px;height:24px;margin:-12px 0 0 -12px;border:2px solid var(--rouge);border-radius:999px;pointer-events:none}
+.wd{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.1em;margin-bottom:-.1em}
+.wd>span{display:inline-block}
+.console-wrap{transform-origin:50% 100%}
+.dia .scan{fill:var(--carmin);opacity:0}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-stopped{overflow:clip}
+
+/* contact */
+.contact{min-height:100svh;display:flex;align-items:center;padding:120px var(--marge)}
+.contact-in{width:min(46vw,680px)}
+.contact h2{font-size:clamp(48px,7vw,116px);line-height:.92;font-weight:800;letter-spacing:-.05em;text-wrap:balance}
+.mail{margin-top:26px;font:500 17px/1.4 "Martian Mono",Menlo,monospace;user-select:all;-webkit-user-select:all}
+@media (max-width:760px){.contact{align-items:flex-end;padding-bottom:96px}.contact-in{width:100%}}
+
+footer{display:flex;flex-wrap:wrap;align-items:center;gap:14px 32px;padding:44px var(--marge) 44px;border-top:1px solid var(--filet);background:var(--papier);color:var(--pierre);font-size:14px}
+footer .logo{height:24px}
+footer a{text-decoration:none}
+footer a:hover{color:var(--carmin)}
+footer .legal{margin-left:auto}
+</style>
+</head>
+<body>
+<script>if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('js-intro');setTimeout(function(){document.documentElement.classList.remove('js-intro');},6000);}</script>
+<div class="intro" aria-hidden="true"><div class="intro-in"><p class="intro-n">000</p><div class="intro-ruler"><i></i></div><p class="intro-l"><span>Cadrage</span><span>Build</span><span>Run</span></p></div></div>
+<div class="cur cur-ring" aria-hidden="true"></div><div class="cur cur-dot" aria-hidden="true"></div>
+<header class="hd">
+  <a class="brand" href="#top" aria-label="DATA SCALE, accueil"><svg class="logo" viewBox="0 0 1275.40 305.14" role="img" aria-label="DATA SCALE" focusable="false"><path class="logo-nuage" d="M68.07 117.88C67.37 105.92 71.17 96.2 77.55 86.3C89.74 67.36 108.59 55.04 131.3 53.54C143.14 52.75 154.17 55.06 164.74 60.47C167 61.63 169.14 62.99 171.33 64.26C171.9 59.47 172.4 54.78 174.1 50.22C178.6 38.18 187.92 28.44 198.15 20.97C220.17 4.88 248.43 -1.63 275.4 0.37C279.91 0.71 284.45 1.23 288.86 2.27C291.26 2.83 293.6 3.63 295.93 4.43C311.95 9.92 325.56 20.55 331.47 36.82C333.65 42.81 334.8 49.26 334.84 55.63C334.85 57.66 334.76 59.68 334.66 61.7C334.63 62.41 334.6 63.12 334.57 63.82C339.26 62.13 343.75 59.94 348.58 58.65C350.77 58.06 353.01 57.69 355.24 57.31C364.57 55.69 371.73 55.52 381.08 57.18C384.58 57.81 387.98 58.57 391.33 59.8C396.7 61.77 401.8 64.57 406.29 68.14C425.01 83.04 436.07 111.53 431.24 135.1C430.21 140.12 428.43 145.03 425.74 149.4C424.81 150.91 423.75 152.34 422.85 153.87C427.24 155.95 431.36 158.24 434.79 161.75C440.64 167.72 443.76 175.98 445.05 184.12C448.09 203.3 440.68 223.77 426.48 236.92C410.13 252.07 384.2 256.33 363 251.21C355.17 249.32 351.51 247.19 344.46 243.87C343.69 245.85 343.15 247.89 342.48 249.9C341.09 254.14 339.02 258.15 336.67 261.94C330.55 271.81 322.53 280.42 313.35 287.51C292.87 303.33 268.52 310.11 243.58 300.93C231.31 296.41 220.6 288.64 211.48 279.35C208.49 276.31 206.05 272.82 203.18 269.67C200.84 272.41 198.71 275.32 196.35 278.04C190.74 284.52 183.71 289.86 176.16 293.89C150.5 307.58 116.4 305.83 92.27 289.6C87.56 286.43 83.35 282.59 79.49 278.44C72.31 270.74 67.04 261.57 63.54 251.66C62.34 248.28 61.31 244.8 60.64 241.27C60.37 239.9 60.24 237.16 59.2 236.18C58.18 235.21 54.56 234.99 53.08 234.7C48.49 233.8 43.96 232.7 39.54 231.19C22.14 225.26 6.25 214.01 1.5 195.34C-4.47 171.86 7.95 145.34 25.73 130.12C32.99 123.92 41.72 119.07 51.19 117.41C56.98 116.4 62.35 116.76 68.07 117.88ZM82.61 133.82C78.74 133.66 75.22 131.46 71.56 130.41C66.64 129.01 61.27 129.18 56.35 130.52C38.47 135.42 22.47 153.03 18.04 170.85C15.43 181.36 15.77 191.32 22.85 200.03C30.52 209.46 42.53 214.29 54.05 217.14C58.48 218.23 66.34 218.95 70.08 220.5C71.37 221.04 72.55 221.84 73.49 222.88C76 225.65 76.06 229.31 76.62 232.8C77.3 237.06 78.4 241.31 80.03 245.32C87.21 262.94 102.19 275.85 120.56 280.67C141.4 286.14 165.02 280.21 180.33 264.91C184.54 260.71 187.94 255.8 190.79 250.59C193.55 245.54 196.18 239.63 202.84 239.38C208.39 239.18 211.24 243.53 213.82 247.71C217.36 253.43 221.27 258.97 225.99 263.79C237.66 275.69 254.76 284.96 271.86 282.9C280.1 281.91 287.86 278.51 294.88 274.21C307.44 266.51 320.15 252.95 323.08 238.12C323.82 234.37 324.12 230.59 323.68 226.78C323.52 225.39 323.21 223.97 322.9 222.53C322 218.34 321.07 214.07 323.62 210.29C324.59 208.85 325.96 207.71 327.56 207.02C329.39 206.22 331.43 205.96 333.42 206.03C340.93 206.29 343.95 211.88 348.64 216.62C351.4 219.41 354.51 221.89 357.88 223.91C361.65 226.16 365.75 227.94 369.98 229.08C387.18 233.71 408.92 229.57 418.88 213.6C421.46 209.47 423.19 204.83 424.13 200.06C426.3 188.96 424.46 174.15 413.18 168.51C407.15 165.5 397.33 167.5 394.29 160.06C391.9 154.22 395.96 150.13 399.78 146.29C400.71 145.35 401.62 144.42 402.43 143.49C407.93 137.12 411.25 130.32 411.16 121.77C411.11 117.28 410.22 112.89 408.93 108.6C408.11 105.86 407.19 103.13 405.98 100.53C404.99 98.42 403.76 96.43 402.49 94.47C397.85 87.27 391.78 81.22 383.7 78.05C371.89 73.42 358.56 74.3 346.53 77.57C342.28 78.72 334.48 81.23 330.83 83.45C328.71 84.73 327.52 86.85 325.63 88.37C322.86 90.6 318.19 90.78 314.95 89.5C312.64 88.59 311.1 86.52 311.05 84.02C311.02 82.53 311.45 81.08 311.88 79.64C312.12 78.83 312.36 78.02 312.52 77.2C313.37 72.89 313.94 68.51 314.32 64.13C314.76 58.94 315.03 53.53 314.05 48.38C312 37.51 305.32 29.64 295.64 24.62C285.62 19.42 274.16 17.93 263 18.46C236.72 19.71 203.79 31.24 190.53 55.64C187.81 60.63 184.94 68.43 185.71 74.16C185.98 76.15 186.93 77.78 187.88 79.42C189.33 81.89 190.78 84.39 189.93 88.18C189.62 89.54 189.02 90.85 188.15 91.94C187.45 92.83 186.57 93.57 185.57 94.1C180.17 96.99 175.14 92.52 171.31 89.1L171.04 88.86C169.05 87.08 167.09 85.28 165.07 83.54C162.65 81.45 160.14 79.45 157.41 77.77C148.97 72.58 138.85 70.44 129.02 71.56C117.39 72.9 106.22 78.52 98.14 86.98C95.06 90.22 92.44 93.87 90.08 97.66C88.28 100.54 86.59 103.5 85.2 106.61C83.57 110.25 82.1 114.32 82.63 118.37C83.17 122.48 85.41 126.2 85.87 130.32C86.09 132.31 84.61 133.89 82.61 133.82Z"/><path class="logo-mot" d="M498.5 194.79C498.5 168.71 516.76 147.49 542.84 147.49C554.84 147.49 564.75 151.49 572.05 158.62V89.76H602.83V239.3H572.4V229.22H572.05C565.44 236.52 555.01 241.91 542.84 241.91C516.76 241.91 498.5 220.87 498.5 194.79ZM925.55 147.49C942.76 147.49 955.46 154.45 955.46 154.45L945.37 174.62C945.37 174.62 934.94 169.05 925.55 169.05C918.77 169.05 915.99 170.27 915.99 174.44C915.99 179.14 922.25 180.53 929.9 182.96C940.1 186.11 952.88 191.46 956.2 204.59C955.49 201.49 955.11 198.27 955.11 194.96C955.11 168.71 978.58 147.49 1004.49 147.49C1024.31 147.49 1034.4 155.84 1034.4 155.84L1023.97 176.88C1023.97 176.88 1018.23 172.7 1009.01 172.7C997.36 172.7 987.8 182.44 987.8 194.61C987.8 206.96 997.36 216.7 1009.01 216.7C1018.23 216.7 1023.97 212.52 1023.97 212.52L1034.4 233.91C1034.4 233.91 1024.31 241.91 1004.49 241.91C982.25 241.91 961.56 226.32 956.36 205.25C956.79 207.16 957.02 209.23 957.02 211.48C957.02 237.74 933.03 241.91 914.77 241.91C893.21 241.91 880.34 229.91 880.34 229.91L892.86 208.87C892.86 208.87 905.03 219.13 914.94 219.13C919.29 219.13 924.51 218.61 924.51 212.7C924.51 206.26 914.77 205.74 904.68 200.53C895.64 195.83 886.6 189.57 886.6 176.18C886.6 157.92 902.08 147.49 925.55 147.49ZM772.36 194.79C772.36 168.71 790.62 147.49 816.7 147.49C828.7 147.49 838.61 151.49 845.91 158.62V150.1H876.69V239.3H846.26V229.22H845.91C839.31 236.52 828.87 241.91 816.7 241.91C790.62 241.91 772.36 220.87 772.36 194.79ZM606.48 194.79C606.48 168.71 624.74 147.49 650.82 147.49C662.82 147.49 672.73 151.49 680.03 158.62V150.1H710.81V239.3H680.38V229.22H680.03C673.42 236.52 662.99 241.91 650.82 241.91C624.74 241.91 606.48 220.87 606.48 194.79ZM1029.7 194.79C1029.7 168.71 1047.96 147.49 1074.04 147.49C1086.04 147.49 1095.95 151.49 1103.26 158.62V150.1H1134.03V239.3H1103.6V229.22H1103.26C1096.65 236.52 1086.21 241.91 1074.04 241.91C1047.96 241.91 1029.7 220.87 1029.7 194.79ZM1275.22 198.96H1210.54C1210.54 212.7 1222.01 217.39 1229.84 217.39C1239.75 217.39 1244.1 215.48 1251.57 207.48L1273.83 218.61C1263.75 235.47 1247.4 241.91 1227.58 241.91C1200.63 241.91 1178.54 220.7 1178.54 194.79C1178.54 168.71 1200.63 147.49 1227.58 147.49C1254.7 147.49 1275.4 163.49 1275.4 194.79C1275.4 196 1275.4 197.92 1275.22 198.96ZM726.11 150.1V116.89H756.89V150.1H775.67V173.57H756.89V201.92C756.89 210.26 758.97 214.26 763.84 214.26C767.84 214.26 771.49 211.48 771.49 211.48L779.14 236.34C779.14 236.34 769.23 241.91 756.54 241.91C732.02 241.91 726.11 223.65 726.11 207.83V173.57H713.24V150.1ZM1144.12 239.3V89.76H1174.89V239.3ZM1062.39 194.79C1062.39 206.96 1070.74 215.65 1083.26 215.65C1095.26 215.65 1103.95 206.96 1103.95 194.79C1103.95 182.44 1094.73 173.75 1083.26 173.75C1071.61 173.75 1062.39 182.44 1062.39 194.79ZM531.19 194.79C531.19 206.96 539.54 215.65 552.06 215.65C564.05 215.65 572.75 206.96 572.75 194.79C572.75 182.44 563.53 173.75 552.06 173.75C540.41 173.75 531.19 182.44 531.19 194.79ZM639.17 194.79C639.17 206.96 647.52 215.65 660.04 215.65C672.03 215.65 680.73 206.96 680.73 194.79C680.73 182.44 671.51 173.75 660.04 173.75C648.39 173.75 639.17 182.44 639.17 194.79ZM805.05 194.79C805.05 206.96 813.4 215.65 825.92 215.65C837.91 215.65 846.61 206.96 846.61 194.79C846.61 182.44 837.39 173.75 825.92 173.75C814.27 173.75 805.05 182.44 805.05 194.79ZM1211.41 181.92H1245.31C1243.92 172.53 1237.49 167.49 1228.45 167.49C1217.84 167.49 1211.93 173.75 1211.41 181.92Z"/></svg></a>
+  <nav aria-label="Navigation principale">
+    <a href="#demarche">Démarche</a><a href="#plateforme">Plateforme</a><a href="#engagement">Engagement</a><a href="#references">Références</a>
+    <a class="btn btn-red" href="#contact">Nous écrire</a>
+  </nav>
+</header>
+<canvas id="field" aria-hidden="true"></canvas>
+<div class="labels" aria-hidden="true"></div>
+<main>
+  <section class="hero" id="top">
+    <div class="hero-text">
+      <h1><span class="kick">Data, cloud et IA,</span> <span class="ln"><span>du cadrage</span></span> <span class="ln"><span>au run.</span></span></h1>
+      <p class="lead">DATA SCALE cadre, construit et opère les plateformes cloud, data et IA des ETI et des grands groupes. Les mêmes équipes, de la première décision à la production.</p>
+      <div class="cta"><a class="btn btn-red" href="#contact">Parler de votre projet</a><a class="btn btn-line" href="#plateforme">Voir la plateforme</a></div>
+    </div>
+  </section>
+
+  <section class="steps" id="demarche" aria-label="Démarche">
+    <div class="steps-in">
+      <div class="steps-text">
+        <article class="step on">
+          <p class="step-k">01 Cadrage</p>
+          <h2>Partir de votre existant.</h2>
+          <p>Applications, données, infrastructure, sécurité, organisation : nous cartographions l'existant et décidons de la cible avec vous, en quelques semaines.</p>
+          <ul><li>Design sprint</li><li>Audit de plateforme</li><li>Stratégie cloud et data</li><li>Organisation cible</li></ul>
+        </article>
+        <article class="step">
+          <p class="step-k">02 Build</p>
+          <h2>Construire la plateforme, au forfait.</h2>
+          <p>Fondations cloud, plateforme de données, applications et IA, couche par couche : un prix, un délai, des jalons facturés à la recette.</p>
+          <ul><li>Landing zone</li><li>Plateforme de données</li><li>Data apps</li><li>Agents IA</li></ul>
+        </article>
+        <article class="step">
+          <p class="step-k">03 Run</p>
+          <h2>Puis la tenir, mesurée.</h2>
+          <p>Centre de services, supervision, niveaux de service au contrat, comité mensuel. Vos équipes reprennent la main à leur rythme.</p>
+          <ul><li>Centre de services</li><li>Direction de plateforme</li><li>Supervision</li><li>FinOps</li></ul>
+        </article>
+      </div>
+      <div class="dots" aria-hidden="true"><i><b></b></i><i><b></b></i><i><b></b></i></div>
+    </div>
+  </section>
+
+  <section class="sec plat" id="plateforme" data-shape="ambient">
+    <div class="sec-head">
+      <h2 class="sec-title">Une plateforme, quatre couches, une équipe.</h2>
+      <p class="sec-lead">Des fondations cloud aux usages IA, nous construisons et tenons chaque couche. Choisissez-en une pour voir les offres.</p>
+    </div>
+    <div class="plat-grid">
+      <div class="console-wrap"><div class="console" id="console">
+        <div class="console-bar"><b>votre plateforme</b><span>/ production</span><span>vue d'ensemble</span></div>
+        <svg class="dia" id="dia" viewBox="0 0 720 404" role="img" aria-label="Schéma d'une plateforme en quatre couches : fondations, plateforme cloud, données, IA et usages. Des flux partent des sources, traversent la couche données et alimentent les usages.">
+          <g class="g g-fond">
+            <rect class="band" x="160" y="296" width="540" height="92" rx="4"/><text class="bl" x="172" y="380">Fondations</text>
+            <rect class="brick" x="172" y="310" width="116" height="44" rx="4"/><text class="nm" x="230" y="337">Réseau</text><circle class="led" cx="278" cy="318" r="3"/>
+            <rect class="brick" x="302" y="310" width="116" height="44" rx="4"/><text class="nm" x="360" y="337">Sécurité</text><circle class="led" cx="408" cy="318" r="3"/>
+            <rect class="brick" x="432" y="310" width="116" height="44" rx="4"/><text class="nm" x="490" y="337">Identités</text><circle class="led" cx="538" cy="318" r="3"/>
+            <rect class="brick" x="562" y="310" width="116" height="44" rx="4"/><text class="nm" x="620" y="337">Automatisation</text><circle class="led" cx="668" cy="318" r="3"/>
+          </g>
+          <g class="g g-cloud">
+            <rect class="band" x="160" y="200" width="540" height="92" rx="4"/><text class="bl" x="172" y="284">Plateforme cloud</text>
+            <rect class="brick" x="172" y="214" width="116" height="44" rx="4"/><text class="nm" x="230" y="241">Conteneurs</text><circle class="led" cx="278" cy="222" r="3"/>
+            <rect class="brick" x="302" y="214" width="116" height="44" rx="4"/><text class="nm" x="360" y="241">Calcul</text><circle class="led" cx="408" cy="222" r="3"/>
+            <rect class="brick" x="432" y="214" width="116" height="44" rx="4"/><text class="nm" x="490" y="241">Stockage</text><circle class="led" cx="538" cy="222" r="3"/>
+            <rect class="brick" x="562" y="214" width="116" height="44" rx="4"/><text class="nm" x="620" y="241">Intégration</text><circle class="led" cx="668" cy="222" r="3"/>
+          </g>
+          <g class="g g-data">
+            <rect class="band" x="160" y="104" width="540" height="92" rx="4"/><text class="bl" x="172" y="188">Données</text>
+            <path class="flow" id="d1" d="M288,140 L302,140"/><path class="flow" id="d2" d="M418,140 L432,140"/><path class="flow" id="d3" d="M548,140 L562,140"/>
+            <rect class="brick" id="n-ing" x="172" y="118" width="116" height="44" rx="4"/><text class="nm" x="230" y="145">Ingestion</text>
+            <rect class="brick" id="n-bru" x="302" y="118" width="116" height="44" rx="4"/><text class="nm" x="360" y="145">Brute</text>
+            <rect class="brick" id="n-raf" x="432" y="118" width="116" height="44" rx="4"/><text class="nm" x="490" y="145">Raffinée</text>
+            <rect class="brick" id="n-exp" x="562" y="118" width="116" height="44" rx="4"/><text class="nm" x="620" y="145">Exposée</text>
+            <g class="pst"><circle cx="425" cy="140" r="9"/><text x="425" y="140">2</text></g>
+          </g>
+          <g class="g g-ia">
+            <rect class="band" x="160" y="8" width="540" height="92" rx="4"/><text class="bl" x="172" y="92">IA et usages</text>
+            <rect class="brick" id="n-ia0" x="172" y="22" width="116" height="44" rx="4"/><text class="nm" x="230" y="49">Data apps</text>
+            <rect class="brick" id="n-ia1" x="302" y="22" width="116" height="44" rx="4"/><text class="nm" x="360" y="49">Agents IA</text>
+            <rect class="brick" id="n-ia2" x="432" y="22" width="116" height="44" rx="4"/><text class="nm" x="490" y="49">Tableaux de bord</text>
+            <rect class="brick" id="n-ia3" x="562" y="22" width="116" height="44" rx="4"/><text class="nm" x="620" y="49">API</text>
+          </g>
+          <g class="g g-riser">
+            <path class="flow" id="r0" d="M678,140 L710,140 L710,14 L230,14 L230,22"/>
+            <path class="flow" id="r1" d="M678,140 L710,140 L710,14 L360,14 L360,22"/>
+            <path class="flow" id="r2" d="M678,140 L710,140 L710,14 L490,14 L490,22"/>
+            <path class="flow" id="r3" d="M678,140 L710,140 L710,14 L620,14 L620,22"/>
+            <g class="pst"><circle cx="710" cy="80" r="9"/><text x="710" y="80">3</text></g>
+          </g>
+          <g class="g g-src">
+            <text class="hdr" x="8" y="30">Sources</text>
+            <path class="flow" id="s0" d="M108,60 C140,60 140,140 172,140"/>
+            <path class="flow" id="s1" d="M108,132 C140,132 140,140 172,140"/>
+            <path class="flow" id="s2" d="M108,204 C140,204 140,140 172,140"/>
+            <path class="flow" id="s3" d="M108,276 C140,276 140,140 172,140"/>
+            <rect class="brick" x="8" y="40" width="100" height="40" rx="4"/><text class="nm" x="58" y="65">Applications</text>
+            <rect class="brick" x="8" y="112" width="100" height="40" rx="4"/><text class="nm" x="58" y="137">Sites web</text>
+            <rect class="brick" x="8" y="184" width="100" height="40" rx="4"/><text class="nm" x="58" y="209">Fichiers</text>
+            <rect class="brick" x="8" y="256" width="100" height="40" rx="4"/><text class="nm" x="58" y="281">Objets</text>
+            <g class="pst"><circle cx="146" cy="140" r="9"/><text x="146" y="140">1</text></g>
+          </g>
+          <rect class="scan" id="scan" x="150" y="4" width="4" height="396"/>
+          <g id="pk"></g>
+        </svg>
+        <div class="status"><span class="ok"><i></i>Opérationnel</span><span><strong id="c-flux">214</strong> flux actifs</span><span><strong id="c-fresh">3 min</strong> de fraîcheur</span><span class="x"><strong>0</strong> incident ouvert</span></div>
+      </div></div>
+
+      <div class="explore">
+        <div class="tabs" role="tablist" aria-label="Couches de la plateforme">
+          <button type="button" role="tab" id="t-cloud" aria-controls="p-cloud" aria-selected="true" data-k="cloud">Cloud</button>
+          <button type="button" role="tab" id="t-data" aria-controls="p-data" aria-selected="false" data-k="data">Data</button>
+          <button type="button" role="tab" id="t-ia" aria-controls="p-ia" aria-selected="false" data-k="ia">IA</button>
+          <button type="button" role="tab" id="t-run" aria-controls="p-run" aria-selected="false" data-k="run">Run</button>
+        </div>
+        <div class="tab-prog" aria-hidden="true"><i></i></div>
+        <div class="pane on" id="p-cloud" role="tabpanel" aria-labelledby="t-cloud">
+          <h3>Des fondations cloud solides.</h3>
+          <p>Landing zones, réseau, sécurité, identités, conteneurs : la plateforme sur laquelle tout le reste repose, décrite en code et prête pour la production.</p>
+          <ul class="offers"><li>Landing zone et plateforme cloud<span>4 sem. à 6 mois</span></li><li>Replatforming sur conteneurs<span>6 à 12 mois</span></li><li>Usine d'infrastructure as code<span>6 à 10 sem.</span></li><li>Platform engineering<span>2 à 3 mois</span></li><li>Sécurité cloud et FinOps<span>1 à 8 sem.</span></li></ul>
+        </div>
+        <div class="pane" id="p-data" role="tabpanel" aria-labelledby="t-data">
+          <h3>Des données fiables, au même endroit.</h3>
+          <p>Ingestion, couches brute, raffinée et exposée, gouvernance et qualité : vos données prêtes à servir les métiers.</p>
+          <ul class="offers"><li>Stratégie de plateforme data<span>3 à 5 mois</span></li><li>Audit 360° de plateforme<span>6 à 8 sem.</span></li><li>Plateforme data moderne<span>2 à 4 mois</span></li><li>Cas d'usage data au forfait<span>1 à 4 mois</span></li><li>Migration de plateformes d'intégration<span>6 mois</span></li><li>Gouvernance et qualité des données<span>4 à 8 sem.</span></li></ul>
+        </div>
+        <div class="pane" id="p-ia" role="tabpanel" aria-labelledby="t-ia">
+          <h3>De l'IA qui sert un métier.</h3>
+          <p>Une application sur vos données réelles en deux semaines avec la méthode Spark, un cadre IA pour votre comité de direction, des agents qui prennent en charge les tâches répétitives.</p>
+          <ul class="offers"><li>Data apps, méthode Spark<span>POC 2 sem.</span></li><li>Cadre et audit de maturité IA<span>4 à 6 sem.</span></li><li>Agents IA et automatisation<span>2 sem. et +</span></li></ul>
+        </div>
+        <div class="pane" id="p-run" role="tabpanel" aria-labelledby="t-run">
+          <h3>Une plateforme tenue, mesurée.</h3>
+          <p>Centre de services, supervision, niveaux de service au contrat, comité mensuel et plan d'amélioration. Vos équipes reprennent la main à leur rythme.</p>
+          <ul class="offers"><li>Centre de services et MCO<span>récurrent</span></li><li>Direction de plateforme et pilotage<span>3 à 5 j / sem.</span></li><li>Observabilité et qualité de service<span>3 à 8 sem.</span></li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec modes" id="engagement" data-shape="ambient">
+    <div class="sec-head">
+      <h2 class="sec-title">Trois façons de travailler avec nous.</h2>
+    </div>
+    <div class="modes-grid">
+      <article class="mode"><div class="ic"><svg stroke="currentColor" fill="none" stroke-width="1.75" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="lu" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"></path><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"></path><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"></path></svg></div><h3>Au forfait</h3><p>Un prix, un délai, des livrables nommés. Jalons facturés au procès-verbal de recette, garantie au contrat.</p></article>
+      <article class="mode"><div class="ic"><svg stroke="currentColor" fill="none" stroke-width="1.75" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="lu" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><path d="m12 14 4-4"></path><path d="M3.34 19a10 10 0 1 1 17.32 0"></path></svg></div><h3>En centre de services</h3><p>Une équipe dédiée, des niveaux de service au contrat, un comité mensuel pour piloter et améliorer.</p></article>
+      <article class="mode"><div class="ic"><svg stroke="currentColor" fill="none" stroke-width="1.75" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="lu" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div><h3>En renfort</h3><p>Des profils seniors intégrés à vos équipes et encadrés par DATA SCALE : architectes, tech leads, ingénieurs data et cloud.</p></article>
+    </div>
+    <p class="modes-note">Dans les trois cas, le transfert de compétences fait partie de la mission. Nous le proposons aussi en formation, d'une demi-journée à cinq jours.</p>
+  </section>
+
+  <section class="sec refs" id="references" data-shape="ambient">
+    <div class="sec-head">
+      <h2 class="sec-title">Ils nous confient leurs plateformes.</h2>
+      <p class="sec-lead">Distribution B2B, agro-industrie, luxe, banque privée, énergie, ingénierie et sport.</p>
+    </div>
+    <div class="kin" role="img" aria-label="Clients : Manutan, Tereos, Groupe Pochet, Oddo BHF, GRDF, Artelia, Saint-Gobain, Salomon, Chanel">
+      <div class="kin-row"><span>Manutan</span><span>Tereos</span><span>Groupe Pochet</span><span>Oddo BHF</span><span>GRDF</span><span>Manutan</span><span>Tereos</span><span>Groupe Pochet</span><span>Oddo BHF</span><span>GRDF</span></div>
+      <div class="kin-row out"><span>Artelia</span><span>Saint-Gobain</span><span>Salomon</span><span>Chanel</span><span>Artelia</span><span>Saint-Gobain</span><span>Salomon</span><span>Chanel</span></div>
+    </div>
+    <p class="refs-note">Références détaillées et contacts communiqués sur demande, avec l'accord de nos clients.</p>
+  </section>
+
+  <section class="contact" id="contact" data-shape="cloudEnd">
+    <div class="contact-in">
+      <h2>Parlons de votre plateforme.</h2>
+      <p class="lead">Trente minutes suffisent pour cadrer le besoin et vous proposer un format : sprint, audit, forfait ou centre de services.</p>
+      <div class="cta"><a class="btn btn-red" href="mailto:samy.bouchikhi@datascale.fr">Écrire à DATA SCALE</a><a class="btn btn-line" href="https://www.linkedin.com/company/datascalefr/" rel="noopener">LinkedIn</a></div>
+      <p class="mail">samy.bouchikhi@datascale.fr</p>
+    </div>
+  </section>
+</main>
+<footer>
+  <a class="brand" href="#top" aria-label="DATA SCALE, accueil"><svg class="logo" viewBox="0 0 1275.40 305.14" role="img" aria-label="DATA SCALE" focusable="false"><path class="logo-nuage" d="M68.07 117.88C67.37 105.92 71.17 96.2 77.55 86.3C89.74 67.36 108.59 55.04 131.3 53.54C143.14 52.75 154.17 55.06 164.74 60.47C167 61.63 169.14 62.99 171.33 64.26C171.9 59.47 172.4 54.78 174.1 50.22C178.6 38.18 187.92 28.44 198.15 20.97C220.17 4.88 248.43 -1.63 275.4 0.37C279.91 0.71 284.45 1.23 288.86 2.27C291.26 2.83 293.6 3.63 295.93 4.43C311.95 9.92 325.56 20.55 331.47 36.82C333.65 42.81 334.8 49.26 334.84 55.63C334.85 57.66 334.76 59.68 334.66 61.7C334.63 62.41 334.6 63.12 334.57 63.82C339.26 62.13 343.75 59.94 348.58 58.65C350.77 58.06 353.01 57.69 355.24 57.31C364.57 55.69 371.73 55.52 381.08 57.18C384.58 57.81 387.98 58.57 391.33 59.8C396.7 61.77 401.8 64.57 406.29 68.14C425.01 83.04 436.07 111.53 431.24 135.1C430.21 140.12 428.43 145.03 425.74 149.4C424.81 150.91 423.75 152.34 422.85 153.87C427.24 155.95 431.36 158.24 434.79 161.75C440.64 167.72 443.76 175.98 445.05 184.12C448.09 203.3 440.68 223.77 426.48 236.92C410.13 252.07 384.2 256.33 363 251.21C355.17 249.32 351.51 247.19 344.46 243.87C343.69 245.85 343.15 247.89 342.48 249.9C341.09 254.14 339.02 258.15 336.67 261.94C330.55 271.81 322.53 280.42 313.35 287.51C292.87 303.33 268.52 310.11 243.58 300.93C231.31 296.41 220.6 288.64 211.48 279.35C208.49 276.31 206.05 272.82 203.18 269.67C200.84 272.41 198.71 275.32 196.35 278.04C190.74 284.52 183.71 289.86 176.16 293.89C150.5 307.58 116.4 305.83 92.27 289.6C87.56 286.43 83.35 282.59 79.49 278.44C72.31 270.74 67.04 261.57 63.54 251.66C62.34 248.28 61.31 244.8 60.64 241.27C60.37 239.9 60.24 237.16 59.2 236.18C58.18 235.21 54.56 234.99 53.08 234.7C48.49 233.8 43.96 232.7 39.54 231.19C22.14 225.26 6.25 214.01 1.5 195.34C-4.47 171.86 7.95 145.34 25.73 130.12C32.99 123.92 41.72 119.07 51.19 117.41C56.98 116.4 62.35 116.76 68.07 117.88ZM82.61 133.82C78.74 133.66 75.22 131.46 71.56 130.41C66.64 129.01 61.27 129.18 56.35 130.52C38.47 135.42 22.47 153.03 18.04 170.85C15.43 181.36 15.77 191.32 22.85 200.03C30.52 209.46 42.53 214.29 54.05 217.14C58.48 218.23 66.34 218.95 70.08 220.5C71.37 221.04 72.55 221.84 73.49 222.88C76 225.65 76.06 229.31 76.62 232.8C77.3 237.06 78.4 241.31 80.03 245.32C87.21 262.94 102.19 275.85 120.56 280.67C141.4 286.14 165.02 280.21 180.33 264.91C184.54 260.71 187.94 255.8 190.79 250.59C193.55 245.54 196.18 239.63 202.84 239.38C208.39 239.18 211.24 243.53 213.82 247.71C217.36 253.43 221.27 258.97 225.99 263.79C237.66 275.69 254.76 284.96 271.86 282.9C280.1 281.91 287.86 278.51 294.88 274.21C307.44 266.51 320.15 252.95 323.08 238.12C323.82 234.37 324.12 230.59 323.68 226.78C323.52 225.39 323.21 223.97 322.9 222.53C322 218.34 321.07 214.07 323.62 210.29C324.59 208.85 325.96 207.71 327.56 207.02C329.39 206.22 331.43 205.96 333.42 206.03C340.93 206.29 343.95 211.88 348.64 216.62C351.4 219.41 354.51 221.89 357.88 223.91C361.65 226.16 365.75 227.94 369.98 229.08C387.18 233.71 408.92 229.57 418.88 213.6C421.46 209.47 423.19 204.83 424.13 200.06C426.3 188.96 424.46 174.15 413.18 168.51C407.15 165.5 397.33 167.5 394.29 160.06C391.9 154.22 395.96 150.13 399.78 146.29C400.71 145.35 401.62 144.42 402.43 143.49C407.93 137.12 411.25 130.32 411.16 121.77C411.11 117.28 410.22 112.89 408.93 108.6C408.11 105.86 407.19 103.13 405.98 100.53C404.99 98.42 403.76 96.43 402.49 94.47C397.85 87.27 391.78 81.22 383.7 78.05C371.89 73.42 358.56 74.3 346.53 77.57C342.28 78.72 334.48 81.23 330.83 83.45C328.71 84.73 327.52 86.85 325.63 88.37C322.86 90.6 318.19 90.78 314.95 89.5C312.64 88.59 311.1 86.52 311.05 84.02C311.02 82.53 311.45 81.08 311.88 79.64C312.12 78.83 312.36 78.02 312.52 77.2C313.37 72.89 313.94 68.51 314.32 64.13C314.76 58.94 315.03 53.53 314.05 48.38C312 37.51 305.32 29.64 295.64 24.62C285.62 19.42 274.16 17.93 263 18.46C236.72 19.71 203.79 31.24 190.53 55.64C187.81 60.63 184.94 68.43 185.71 74.16C185.98 76.15 186.93 77.78 187.88 79.42C189.33 81.89 190.78 84.39 189.93 88.18C189.62 89.54 189.02 90.85 188.15 91.94C187.45 92.83 186.57 93.57 185.57 94.1C180.17 96.99 175.14 92.52 171.31 89.1L171.04 88.86C169.05 87.08 167.09 85.28 165.07 83.54C162.65 81.45 160.14 79.45 157.41 77.77C148.97 72.58 138.85 70.44 129.02 71.56C117.39 72.9 106.22 78.52 98.14 86.98C95.06 90.22 92.44 93.87 90.08 97.66C88.28 100.54 86.59 103.5 85.2 106.61C83.57 110.25 82.1 114.32 82.63 118.37C83.17 122.48 85.41 126.2 85.87 130.32C86.09 132.31 84.61 133.89 82.61 133.82Z"/><path class="logo-mot" d="M498.5 194.79C498.5 168.71 516.76 147.49 542.84 147.49C554.84 147.49 564.75 151.49 572.05 158.62V89.76H602.83V239.3H572.4V229.22H572.05C565.44 236.52 555.01 241.91 542.84 241.91C516.76 241.91 498.5 220.87 498.5 194.79ZM925.55 147.49C942.76 147.49 955.46 154.45 955.46 154.45L945.37 174.62C945.37 174.62 934.94 169.05 925.55 169.05C918.77 169.05 915.99 170.27 915.99 174.44C915.99 179.14 922.25 180.53 929.9 182.96C940.1 186.11 952.88 191.46 956.2 204.59C955.49 201.49 955.11 198.27 955.11 194.96C955.11 168.71 978.58 147.49 1004.49 147.49C1024.31 147.49 1034.4 155.84 1034.4 155.84L1023.97 176.88C1023.97 176.88 1018.23 172.7 1009.01 172.7C997.36 172.7 987.8 182.44 987.8 194.61C987.8 206.96 997.36 216.7 1009.01 216.7C1018.23 216.7 1023.97 212.52 1023.97 212.52L1034.4 233.91C1034.4 233.91 1024.31 241.91 1004.49 241.91C982.25 241.91 961.56 226.32 956.36 205.25C956.79 207.16 957.02 209.23 957.02 211.48C957.02 237.74 933.03 241.91 914.77 241.91C893.21 241.91 880.34 229.91 880.34 229.91L892.86 208.87C892.86 208.87 905.03 219.13 914.94 219.13C919.29 219.13 924.51 218.61 924.51 212.7C924.51 206.26 914.77 205.74 904.68 200.53C895.64 195.83 886.6 189.57 886.6 176.18C886.6 157.92 902.08 147.49 925.55 147.49ZM772.36 194.79C772.36 168.71 790.62 147.49 816.7 147.49C828.7 147.49 838.61 151.49 845.91 158.62V150.1H876.69V239.3H846.26V229.22H845.91C839.31 236.52 828.87 241.91 816.7 241.91C790.62 241.91 772.36 220.87 772.36 194.79ZM606.48 194.79C606.48 168.71 624.74 147.49 650.82 147.49C662.82 147.49 672.73 151.49 680.03 158.62V150.1H710.81V239.3H680.38V229.22H680.03C673.42 236.52 662.99 241.91 650.82 241.91C624.74 241.91 606.48 220.87 606.48 194.79ZM1029.7 194.79C1029.7 168.71 1047.96 147.49 1074.04 147.49C1086.04 147.49 1095.95 151.49 1103.26 158.62V150.1H1134.03V239.3H1103.6V229.22H1103.26C1096.65 236.52 1086.21 241.91 1074.04 241.91C1047.96 241.91 1029.7 220.87 1029.7 194.79ZM1275.22 198.96H1210.54C1210.54 212.7 1222.01 217.39 1229.84 217.39C1239.75 217.39 1244.1 215.48 1251.57 207.48L1273.83 218.61C1263.75 235.47 1247.4 241.91 1227.58 241.91C1200.63 241.91 1178.54 220.7 1178.54 194.79C1178.54 168.71 1200.63 147.49 1227.58 147.49C1254.7 147.49 1275.4 163.49 1275.4 194.79C1275.4 196 1275.4 197.92 1275.22 198.96ZM726.11 150.1V116.89H756.89V150.1H775.67V173.57H756.89V201.92C756.89 210.26 758.97 214.26 763.84 214.26C767.84 214.26 771.49 211.48 771.49 211.48L779.14 236.34C779.14 236.34 769.23 241.91 756.54 241.91C732.02 241.91 726.11 223.65 726.11 207.83V173.57H713.24V150.1ZM1144.12 239.3V89.76H1174.89V239.3ZM1062.39 194.79C1062.39 206.96 1070.74 215.65 1083.26 215.65C1095.26 215.65 1103.95 206.96 1103.95 194.79C1103.95 182.44 1094.73 173.75 1083.26 173.75C1071.61 173.75 1062.39 182.44 1062.39 194.79ZM531.19 194.79C531.19 206.96 539.54 215.65 552.06 215.65C564.05 215.65 572.75 206.96 572.75 194.79C572.75 182.44 563.53 173.75 552.06 173.75C540.41 173.75 531.19 182.44 531.19 194.79ZM639.17 194.79C639.17 206.96 647.52 215.65 660.04 215.65C672.03 215.65 680.73 206.96 680.73 194.79C680.73 182.44 671.51 173.75 660.04 173.75C648.39 173.75 639.17 182.44 639.17 194.79ZM805.05 194.79C805.05 206.96 813.4 215.65 825.92 215.65C837.91 215.65 846.61 206.96 846.61 194.79C846.61 182.44 837.39 173.75 825.92 173.75C814.27 173.75 805.05 182.44 805.05 194.79ZM1211.41 181.92H1245.31C1243.92 172.53 1237.49 167.49 1228.45 167.49C1217.84 167.49 1211.93 173.75 1211.41 181.92Z"/></svg></a>
+  <p>Data, cloud et IA, du cadrage au run.</p>
+  <a href="https://www.linkedin.com/company/datascalefr/" rel="noopener">LinkedIn</a>
+  <a href="mentions-legales.html">Mentions légales</a>
+  <p class="legal">© 2026 DATA SCALE, SASU, SIREN 952 569 580</p>
+</footer>
+
+<script src="assets/js/gsap.min.js"></script>
+<script src="assets/js/ScrollTrigger.min.js"></script>
+<script src="assets/js/lenis.min.js"></script>
+<script>
+(function(){
+'use strict';
+var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+var hd = document.querySelector('.hd');
+window.addEventListener('scroll', function(){ hd.classList.toggle('scrolled', window.scrollY > 30); }, {passive:true});
+
+/* =================== champ de particules =================== */
+var CLOUD_D = "M200.16 262.3C196.88 265.28 193.57 270.31 190.16 274.03C185.38 279.25 179.45 283.83 173.3 287.33C148.48 301.43 114.51 299.94 90.85 284.02C85.95 280.72 81.57 276.6 77.62 272.22C70.8 264.67 66 255.64 62.8 246.02C61.97 243.5 61.26 240.91 60.69 238.32C60.29 236.47 60.14 234.53 59.5 232.74C59.24 232.02 58.86 231.33 58.28 230.82C56.62 229.37 53.82 229.32 51.75 228.93C47.5 228.12 43.27 227.18 39.15 225.86C22.54 220.53 6.85 210.56 1.75 192.88C-6.53 164.19 15.8 127.1 43.85 118.5C49.31 116.83 55.37 116.28 61.02 117.17C63.43 117.55 65.77 118.15 68.2 118.41C68.22 117.2 68.14 116 68.06 114.8C68 114 67.95 113.19 67.93 112.38C67.78 107.13 69 101.91 70.73 96.97C72.33 92.45 74.93 88.16 77.54 84.15C91.04 63.39 112.8 51.87 137.63 53.52C145.37 54.03 153.02 56.51 159.94 59.92C163.68 61.77 166.96 64.34 170.89 65.81C171.83 57.73 171.57 52.92 175.2 45.15C178.91 37.17 184.81 30.35 191.46 24.67C211.17 7.84 237.8 -0.12 263.48 0C270.18 0.04 278.59 0.67 285.12 2.16C286.99 2.59 288.82 3.23 290.64 3.83C300.92 7.15 310.35 12.51 317.46 20.75C324.65 29.11 328.16 39.72 328.74 50.63C328.87 53.06 328.75 55.49 328.64 57.91C328.53 60.31 328.41 62.71 328.54 65.11C334.42 63.22 339.9 60.36 345.86 58.66C348.24 57.98 350.67 57.61 353.1 57.19C361.96 55.63 368.19 55.43 377.1 57.05C379.13 57.42 381.17 57.73 383.16 58.28C389.54 60.03 395.89 63.16 401.09 67.23C418.76 81.1 429.41 107.95 425.51 130.14C424.57 135.5 422.67 140.93 419.69 145.51C418.28 147.67 416.75 149.7 415.49 151.96C417.36 153.08 419.33 153.92 421.28 154.87C425.79 157.08 429.68 160.24 432.55 164.39C435.72 168.96 437.68 174.41 438.74 179.84C443.06 202.02 432.14 226.82 412.55 238.27C406.24 241.95 399.37 244.34 392.23 245.75C379.86 248.2 369.01 247.76 356.87 244.24C349.63 242.14 345.97 239.27 339.79 236.88C337.95 240.49 337.24 244.6 335.71 248.36C333.47 253.85 330.27 258.91 326.75 263.65C321 271.39 313.94 278.15 306.17 283.83C284.34 299.77 259.71 304.29 234.83 292.19C225.28 287.54 216.94 280.83 209.62 273.19C206.28 269.72 203.71 265.56 200.16 262.3ZM79.9 127.82C76.13 127.44 72.81 125.42 69.17 124.42C63.94 122.98 58.04 123.1 52.8 124.5C33.51 129.67 16.12 148.87 11.81 168.23C9.45 178.83 9.78 188.7 16.52 197.68C24.68 208.55 37 213.43 49.69 216.89C53.76 218 63.08 219.18 65.67 220.15C66.67 220.53 67.59 221.11 68.3 221.93C70.27 224.19 70.13 227.47 70.61 230.27C71.37 234.75 72.5 239.31 74.24 243.52C81.58 261.37 95.94 274.25 114.38 279.88C136.44 286.63 161.72 280.88 178.45 264.98C183.84 259.86 187.77 254.06 191.2 247.52C193.12 243.87 195.25 239.5 199.99 239.35C203.89 239.23 205.99 242.63 207.8 245.58C207.89 245.72 207.97 245.86 208.06 245.99C212.01 252.42 216.48 258.69 221.91 263.97C234.28 275.98 251.8 285.1 269.49 282.84C278.16 281.73 286.15 278.22 293.54 273.68C306.35 265.82 319.77 251.38 322.89 236.29C324.21 229.85 324.25 225.35 322.89 218.9C322.51 217.1 321.99 215.29 321.9 213.44C321.75 210.67 323.02 207.93 325.65 206.77C327.07 206.14 328.69 205.96 330.24 206C336.44 206.16 339.16 211.27 343.02 215.26C346.35 218.71 350.28 221.81 354.47 224.14C358.22 226.23 362.3 227.95 366.45 229.04C381.51 232.99 400.38 230.54 412.15 219.75C418.41 214.02 422.35 206.1 424.02 197.85C426.52 185.42 424.33 170.29 412.49 163.31C404.84 158.8 395.44 162.04 393.71 154.87C392.86 151.39 395.55 148.75 397.87 146.48C398.15 146.2 398.43 145.92 398.7 145.65C403.13 141.17 406.91 136.23 409.21 130.32C412.17 122.71 411.4 113.69 409.17 105.99C408.23 102.74 407.18 99.51 405.78 96.42C404.7 94.06 403.33 91.86 401.93 89.69C396.33 80.99 389.55 74.7 379.56 71.42C364.47 66.46 347.8 69.14 333.26 74.73C330.53 75.79 327.39 76.87 325.03 78.63C323.8 79.54 323 80.49 322.29 81.34C320.81 83.11 319.67 84.46 315.78 84.17C314.6 84.09 313.29 83.98 312.28 83.31C310.32 82.03 311.06 79.75 311.67 77.83C311.79 77.47 311.9 77.12 311.99 76.79C312.34 75.52 312.56 74.21 312.79 72.91C314.22 64.77 315.63 51.71 313.77 43.71C311.38 33.47 305.78 25.85 296.76 20.44C278.67 9.61 256.11 11.22 236.39 15.97C214.29 21.29 189.57 35.68 181.71 58.22C180.27 62.36 178.85 68.51 179.91 72.85C180.29 74.39 181.12 75.82 181.94 77.23C183.4 79.74 184.84 82.21 183.75 85.28C183.37 86.34 182.72 87.31 181.82 87.99C178.24 90.68 174.24 87.29 171.57 84.95C162.6 77.07 157.39 71.25 145.49 67.42C127.57 61.65 107.63 67.61 94.28 80.51C90.47 84.19 87.27 88.57 84.48 93.05C81.2 98.29 77.43 105.27 76.59 111.44C76.05 115.44 77.15 118.73 78.28 122.11C78.9 123.95 79.52 125.81 79.9 127.82Z", VBW = 439.68, VBH = 299.07;
+var cv = document.getElementById('field'), ctx = cv.getContext('2d'), labelsEl = document.querySelector('.labels');
+var W = 0, H = 0, DPR = 1, N = 0, P = [], cloudPts = [], current = null, time = 0, labelTok = 0, stepScale = 1;
+var cam = {yaw:0, pitch:0, cx:0, cy:0, tyaw:0, tpitch:0, tcx:0, tcy:0};
+var mouse = {x:-9999, y:-9999, nx:0, ny:0};
+var INK = '#1D1A18', RED = '#FC3030', labels = [], hl = -1, hlTimer = null, agit = 0;
+function rnd(a, b){ return a + Math.random() * (b - a); }
+function gauss(){ var u = 1 - Math.random(), v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(6.2832 * v); }
+function sampleCloud(){
+  var S = 900, sc = S / VBW, c = document.createElement('canvas'); c.width = S; c.height = Math.ceil(VBH * sc);
+  var g = c.getContext('2d'); g.setTransform(sc, 0, 0, sc, 0, 0); g.fill(new Path2D(CLOUD_D));
+  var d = g.getImageData(0, 0, c.width, c.height).data, out = [];
+  for (var y = 0; y < c.height; y += 2) for (var x = 0; x < c.width; x += 2) if (d[(y * c.width + x) * 4 + 3] > 140) out.push([x / S - .5, (y - c.height / 2) / S]);
+  return out;
+}
+function lay(){
+  var mob = W < 760;
+  return {mob:mob, cx: mob ? W * .5 : W * .71, cy: mob ? H * .3 : H * .53, s: mob ? Math.min(W * .66, H * .42, 360) : Math.min(W * .42, H * .92, 700)};
+}
+function pick(){ return cloudPts[(Math.random() * cloudPts.length) | 0]; }
+var SHAPES = {
+  chaos: function(){ return {cam:[0, 0, W / 2, H / 2], labels:[], gen:function(){ return [rnd(-W * .62, W * .62), rnd(-H * .62, H * .62), rnd(-700, 450), Math.random() < .14, .9, 16]; }}; },
+  cloud: function(l){ var s = l.s; return {cam:[0, 0, l.cx, l.cy], labels:[], gen:function(){ var p = pick(); return [p[0] * s, p[1] * s, rnd(-s * .012, s * .012), true, 1, 1.1]; }}; },
+  si: function(l){
+    var s = l.s, C = [[-.36, -.24, 'Applications'], [.10, -.36, 'Données'], [.42, -.04, 'Infrastructure'], [.16, .30, 'Sécurité'], [-.30, .25, 'Organisation']];
+    return {cam:[0, 0, l.cx, l.cy], labels: C.map(function(c){ return {t:c[2], x:c[0] * s, y:c[1] * s - s * .13, z:0}; }),
+      gen:function(i){
+        if (Math.random() < .1) return [rnd(-s * .58, s * .58), rnd(-s * .48, s * .48), rnd(-120, 120), false, .3, 9];
+        var c = C[i % 5], r = s * .075, a = Math.random() * 6.2832;
+        if (Math.random() < .55) return [c[0] * s + Math.cos(a) * r, c[1] * s + Math.sin(a) * r, rnd(-4, 4), false, 1, 1.4];
+        return [c[0] * s + gauss() * r * .3, c[1] * s + gauss() * r * .3, gauss() * r * .3, Math.random() < .35, 1, 2];
+      }};
+  },
+  strates: function(l){
+    var s = l.s * .98, n = 4, D = s * .36, gap = s * .2, th = s * .032, widths = [], perim = [], tot = 0;
+    for (var k = 0; k < n; k++){ widths[k] = s * (.42 + k * .17); perim[k] = widths[k] + D; tot += perim[k]; }
+    var names = ['IA et usages', 'Données', 'Plateforme cloud', 'Fondations'], y0 = -gap * 1.5;
+    return {cam:[.52, .4, l.cx, l.cy],
+      labels: names.map(function(nm, k){ return {t:nm, x:widths[k] / 2 + 16, y:y0 + k * gap + th, z:-D / 2 - 10, layer:k}; }),
+      gen:function(){
+        var r = Math.random() * tot, k = 0;
+        while (k < n - 1 && r > perim[k]){ r -= perim[k]; k++; }
+        var w = widths[k], y = y0 + k * gap, u, v, h = 0, q = Math.random();
+        if (q < .5){
+          var e = Math.random() * 2 * (w + D);
+          if (e < w){ u = -w / 2 + e; v = -D / 2; } else if (e < w + D){ u = w / 2; v = -D / 2 + (e - w); }
+          else if (e < 2 * w + D){ u = w / 2 - (e - w - D); v = D / 2; } else { u = -w / 2; v = D / 2 - (e - 2 * w - D); }
+        } else if (q < .72){
+          if (Math.random() < .55){ u = rnd(-w / 2, w / 2); v = -D / 2; } else { u = w / 2; v = rnd(-D / 2, D / 2); }
+          h = rnd(0, th);
+        } else { u = rnd(-w / 2, w / 2); v = rnd(-D / 2, D / 2); }
+        return [u, y + h, v, false, q < .72 ? 1 : .55, .6, k];
+      }};
+  },
+  regle: function(l){
+    var Lr = l.mob ? W * .82 : Math.min(W * .46, 720), x0 = -Lr / 2, ticks = 40, cur = .64;
+    return {cam:[0, 0, l.cx, l.cy],
+      labels:[{t:'Cadrage', x:x0, y:-58, z:0}, {t:'Build', x:0, y:-58, z:0}, {t:'Run', x:-x0, y:-58, z:0}, {t:'Mesuré chaque mois', x:x0 + Lr * cur, y:34, z:0, red:true}],
+      gen:function(){
+        var r = Math.random();
+        if (r < .34) return [rnd(x0, x0 + Lr * cur), rnd(-4, 5), rnd(-8, 8), true, 1, .7];
+        if (r < .56) return [rnd(x0, -x0), rnd(-1.2, 1.2), rnd(-3, 3), false, 1, .5];
+        var t = (Math.random() * (ticks + 1)) | 0, major = (t % 10 === 0), h = major ? 40 : 15;
+        return [x0 + t * Lr / ticks + rnd(-.9, .9), -rnd(0, h), rnd(-2, 2), false, 1, .45];
+      }};
+  },
+  ambient: function(){ return {cam:[0, 0, W / 2, H / 2], labels:[], gen:function(){ return [rnd(-W * .56, W * .56), rnd(-H * .58, H * .58), rnd(-600, 300), Math.random() < .1, .18, 22]; }}; },
+  cloudEnd: function(l){
+    var s = l.mob ? Math.min(W * .9, 420) : l.s * 1.1;
+    return {cam:[0, 0, l.cx, l.mob ? H * .3 : l.cy], labels:[], gen:function(){ var p = pick(); return [p[0] * s, p[1] * s, rnd(-s * .06, s * .06), true, l.mob ? .22 : 1, 2.2]; }};
+  }
+};
+function ensureLabels(n){ while (labels.length < n){ var el = document.createElement('span'); labelsEl.appendChild(el); labels.push({el:el, x:0, y:0, z:0, active:false, layer:-1}); } }
+function applyHl(){
+  for (var i = 0; i < N; i++){ var p = P[i]; if (p.layer >= 0) p.red = (p.layer === hl); }
+  labels.forEach(function(L){ if (L.active && L.layer >= 0) L.el.classList.toggle('red', L.layer === hl); });
+}
+function cycle(on){
+  if (hlTimer){ clearInterval(hlTimer); hlTimer = null; }
+  if (!on) return;
+  hl = 3; applyHl();
+  if (!reduce) hlTimer = setInterval(function(){ hl = hl <= 0 ? 3 : hl - 1; applyHl(); }, 1300);
+}
+function setShape(name, force){
+  if (!force && name === current) return;
+  current = name;
+  var f = SHAPES[name](lay());
+  for (var i = 0; i < N; i++){
+    var g = f.gen(i), p = P[i];
+    p.tx = g[0]; p.ty = g[1]; p.tz = g[2]; p.red = g[3]; p.ta = g[4]; p.amp = g[5]; p.layer = g.length > 6 ? g[6] : -1;
+  }
+  cam.tyaw = f.cam[0]; cam.tpitch = f.cam[1]; cam.tcx = f.cam[2]; cam.tcy = f.cam[3];
+  var tok = ++labelTok, defs = f.labels;
+  ensureLabels(defs.length);
+  labels.forEach(function(L, k){
+    L.el.classList.remove('on');
+    if (k < defs.length){
+      L.active = true; L.x = defs[k].x; L.y = defs[k].y; L.z = defs[k].z; L.layer = defs[k].layer === undefined ? -1 : defs[k].layer;
+      L.el.textContent = defs[k].t; L.el.classList.toggle('red', !!defs[k].red);
+      setTimeout(function(){ if (tok === labelTok) L.el.classList.add('on'); }, force ? 0 : 650);
+    } else { L.active = false; L.layer = -1; }
+  });
+  cycle(name === 'strates');
+  if (reduce) snap();
+}
+function snap(){
+  for (var i = 0; i < N; i++){ var p = P[i]; p.x = p.tx; p.y = p.ty; p.z = p.tz; p.vx = p.vy = p.vz = 0; p.a = p.ta; }
+  cam.yaw = cam.tyaw; cam.pitch = cam.tpitch; cam.cx = cam.tcx; cam.cy = cam.tcy; draw(false);
+}
+function resize(){
+  var w = window.innerWidth, h = window.innerHeight, changed = Math.abs(w - W) > 1 || Math.abs(h - H) > 120;
+  W = w; H = h; DPR = Math.min(window.devicePixelRatio || 1, 2);
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cv.style.width = W + 'px'; cv.style.height = H + 'px';
+  return changed;
+}
+function draw(physics){
+  var k = .034 * stepScale, damp = Math.pow(.86, stepScale), F = 1150, R = 120, R2 = R * R;
+  if (physics){
+    cam.yaw += (cam.tyaw + mouse.nx * .24 - cam.yaw) * .045; cam.pitch += (cam.tpitch + mouse.ny * .14 - cam.pitch) * .045;
+    cam.cx += (cam.tcx - cam.cx) * .05; cam.cy += (cam.tcy - cam.cy) * .05;
+  }
+  var ca = Math.cos(cam.yaw), sa = Math.sin(cam.yaw), cb = Math.cos(cam.pitch), sb = Math.sin(cam.pitch), mx = mouse.x, my = mouse.y, i, p;
+  for (i = 0; i < N; i++){
+    p = P[i];
+    if (physics){
+      var am = p.amp * (1 + agit * 7);
+      var tx = p.tx + Math.sin(time * .7 + p.ph) * am, ty = p.ty + Math.cos(time * .6 + p.ph * 1.7) * am, tz = p.tz + Math.sin(time * .5 + p.ph * 2.3) * am;
+      p.vx = (p.vx + (tx - p.x) * k) * damp; p.vy = (p.vy + (ty - p.y) * k) * damp; p.vz = (p.vz + (tz - p.z) * k) * damp;
+      p.x += p.vx; p.y += p.vy; p.z += p.vz; p.a += (p.ta - p.a) * .035;
+    }
+    var x1 = p.x * ca + p.z * sa, z1 = -p.x * sa + p.z * ca, y2 = p.y * cb - z1 * sb, z2 = p.y * sb + z1 * cb, s = F / (F + z2);
+    if (s <= .05){ p.ss = 0; continue; }
+    var sx = cam.cx + x1 * s, sy = cam.cy + y2 * s;
+    if (physics){ var dx = sx - mx, dy = sy - my, d2 = dx * dx + dy * dy; if (d2 < R2){ var d = Math.sqrt(d2) || 1, f = (1 - d / R) * 2.6 / s; p.vx += dx / d * f; p.vy += dy / d * f; } }
+    p.sx = sx; p.sy = sy; p.ss = p.sz * Math.min(1.9, s); p.sa = Math.max(0, Math.min(1, p.a * (.3 + .7 * Math.min(1, s))));
+  }
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = INK;
+  for (i = 0; i < N; i++){ p = P[i]; if (p.red || !p.ss) continue; ctx.globalAlpha = p.sa * .86; ctx.fillRect(p.sx - p.ss / 2, p.sy - p.ss / 2, p.ss, p.ss); }
+  ctx.fillStyle = RED;
+  for (i = 0; i < N; i++){ p = P[i]; if (!p.red || !p.ss) continue; ctx.globalAlpha = p.sa; ctx.fillRect(p.sx - p.ss / 2, p.sy - p.ss / 2, p.ss, p.ss); }
+  ctx.globalAlpha = 1;
+  for (i = 0; i < labels.length; i++){
+    var L = labels[i]; if (!L.active) continue;
+    var lx1 = L.x * ca + L.z * sa, lz1 = -L.x * sa + L.z * ca, ly2 = L.y * cb - lz1 * sb, lz2 = L.y * sb + lz1 * cb, ls = F / (F + lz2);
+    L.el.style.transform = 'translate(' + (cam.cx + lx1 * ls).toFixed(1) + 'px,' + (cam.cy + ly2 * ls).toFixed(1) + 'px) translate(-50%,-50%)';
+  }
+}
+var last = 0, fieldOn = true;
+function frame(now){
+  var dt = last ? Math.min(50, now - last) : 16; last = now; time += dt / 1000; stepScale = Math.min(2.5, dt / 16.67);
+  agit *= Math.pow(.93, stepScale);
+  if (fieldOn) draw(true);
+  if (letters.length && heroOn) weights();
+  requestAnimationFrame(frame);
+}
+function initField(){
+  resize(); cloudPts = sampleCloud();
+  N = W < 760 ? 1600 : (W < 1200 ? 3000 : 4200);
+  for (var i = 0; i < N; i++) P.push({x:rnd(-W * .6, W * .6), y:rnd(-H * .6, H * .6), z:rnd(-700, 450), vx:0, vy:0, vz:0, tx:0, ty:0, tz:0, red:false, a:0, ta:1, amp:10, ph:Math.random() * 6.2832, sz:rnd(1.6, 2.9), sx:0, sy:0, ss:0, sa:0, layer:-1});
+  cam.cx = W / 2; cam.cy = H / 2;
+  setShape(reduce ? 'cloud' : 'chaos', true);
+  if (!reduce) requestAnimationFrame(frame);
+}
+window.addEventListener('resize', function(){ if (resize() && current) setShape(current, true); else if (reduce) draw(false); });
+if ('IntersectionObserver' in window){
+  var vis = new Map(), watch = [].slice.call(document.querySelectorAll('.hero, .steps, .contact'));
+  var io = new IntersectionObserver(function(es){ es.forEach(function(e){ vis.set(e.target, e.isIntersecting); if (e.target.classList.contains('hero')) heroOn = e.isIntersecting; });
+    var any = false; vis.forEach(function(v){ if (v) any = true; }); fieldOn = any; if (!any){ ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height); labels.forEach(function(L){ L.el.classList.remove('on'); }); } });
+  watch.forEach(function(el){ io.observe(el); });
+}
+if (fine && !reduce){
+  window.addEventListener('mousemove', function(e){ mouse.x = e.clientX; mouse.y = e.clientY; mouse.nx = e.clientX / W - .5; mouse.ny = e.clientY / H - .5; });
+  document.addEventListener('mouseleave', function(){ mouse.x = mouse.y = -9999; });
+}
+/* impulsion radiale : clic, changement de forme */
+function burst(cx, cy, strength, radius){
+  for (var i = 0; i < N; i++){
+    var p = P[i]; if (!p.ss) continue;
+    var dx = p.sx - cx, dy = p.sy - cy, d = Math.sqrt(dx * dx + dy * dy) || 1, f = strength * Math.exp(-d / radius);
+    p.vx += dx / d * f; p.vy += dy / d * f; p.vz += (Math.random() - .5) * f * 1.6;
+  }
+}
+/* titre : la graisse des lettres réagit à la souris */
+var letters = [], heroOn = true;
+function splitLetters(){
+  [].slice.call(document.querySelectorAll('h1 .ln > span')).forEach(function(span){
+    var t = span.textContent; span.textContent = '';
+    for (var i = 0; i < t.length; i++){
+      if (t[i] === ' '){ span.appendChild(document.createTextNode(' ')); continue; }
+      var l = document.createElement('span'); l.className = 'lt'; l.textContent = t[i]; span.appendChild(l);
+      letters.push({el:l, w:800});
+    }
+  });
+}
+function weights(){
+  for (var i = 0; i < letters.length; i++){
+    var L = letters[i], r = L.el.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    var d = Math.sqrt((cx - mouse.x) * (cx - mouse.x) + (cy - mouse.y) * (cy - mouse.y));
+    var target = 800 - 420 * Math.max(0, 1 - d / 260);
+    var w = L.w + (target - L.w) * .16;
+    if (Math.abs(w - L.w) > .5){ L.w = w; L.el.style.fontWeight = Math.round(w); }
+  }
+}
+if (fine && !reduce) splitLetters();
+initField();
+
+/* =================== plateforme vivante =================== */
+var NS = 'http://www.w3.org/2000/svg', dia = document.getElementById('dia'), pkLayer = document.getElementById('pk'), con = document.getElementById('console');
+function PT(id){ var el = document.getElementById(id); return {el:el, len:el.getTotalLength()}; }
+var src = [0, 1, 2, 3].map(function(i){ return PT('s' + i); }), ris = [0, 1, 2, 3].map(function(j){ return PT('r' + j); });
+var d1 = PT('d1'), d2 = PT('d2'), d3 = PT('d3');
+var packets = [], plast = 0, acc = 0, diaOn = false;
+function flash(id){ var n = document.getElementById(id); if (!n) return; n.classList.add('hit'); clearTimeout(n._t); n._t = setTimeout(function(){ n.classList.remove('hit'); }, 280); }
+function spawn(){
+  var i = (Math.random() * 4) | 0, j = (Math.random() * 4) | 0, c = document.createElementNS(NS, 'circle');
+  c.setAttribute('r', '3.4'); c.setAttribute('class', 'pk'); pkLayer.appendChild(c);
+  packets.push({c:c, route:[src[i], d1, d2, d3, ris[j]], ends:['n-ing', 'n-bru', 'n-raf', 'n-exp', 'n-ia' + j], seg:0, d:0, wait:0, sp:.15 * (.85 + Math.random() * .3)});
+}
+function ptick(now){
+  var dt = plast ? Math.min(60, now - plast) : 16; plast = now;
+  if (diaOn){
+    acc += dt;
+    while (acc > 260){ acc -= 260; if (packets.length < 22) spawn(); }
+    for (var k = packets.length - 1; k >= 0; k--){
+      var p = packets[k];
+      if (p.wait > 0){ p.wait -= dt; if (p.wait > 0) continue; p.c.style.opacity = 1; }
+      var seg = p.route[p.seg]; p.d += p.sp * dt;
+      if (p.d >= seg.len){
+        flash(p.ends[p.seg]); p.seg++; p.d = 0;
+        if (p.seg >= p.route.length){ pkLayer.removeChild(p.c); packets.splice(k, 1); continue; }
+        if (p.seg < 4){ p.wait = 220; p.c.style.opacity = 0; }
+        seg = p.route[p.seg];
+      }
+      var pt = seg.el.getPointAtLength(Math.min(p.d, seg.len));
+      p.c.setAttribute('cx', pt.x.toFixed(1)); p.c.setAttribute('cy', pt.y.toFixed(1));
+    }
+  }
+  requestAnimationFrame(ptick);
+}
+var leds = [].slice.call(document.querySelectorAll('.dia .led'));
+if (!reduce){
+  requestAnimationFrame(ptick);
+  if ('IntersectionObserver' in window) new IntersectionObserver(function(e){ diaOn = e[0].isIntersecting; }, {rootMargin:'100px'}).observe(con); else diaOn = true;
+  setInterval(function(){ if (!diaOn) return; var l = leds[(Math.random() * leds.length) | 0]; l.classList.add('on'); setTimeout(function(){ l.classList.remove('on'); }, 900); }, 240);
+  var cFlux = document.getElementById('c-flux'), cFresh = document.getElementById('c-fresh'), flux = 214, fresh = 3;
+  setInterval(function(){ if (!diaOn) return; flux = Math.max(208, Math.min(221, flux + ((Math.random() * 5) | 0) - 2)); cFlux.textContent = flux; fresh = fresh >= 5 ? 1 : fresh + 1; cFresh.textContent = fresh + ' min'; }, 1600);
+}
+
+/* onglets Cloud · Data · IA · Run */
+var tabs = [].slice.call(document.querySelectorAll('.tabs button')), panes = [].slice.call(document.querySelectorAll('.pane'));
+var bar = document.querySelector('.tab-prog i'), progWrap = document.querySelector('.tab-prog'), auto = !reduce, autoTimer = null, ti = 0;
+function select(k, fromUser){
+  tabs.forEach(function(t, n){ var on = t.getAttribute('data-k') === k; t.setAttribute('aria-selected', on ? 'true' : 'false'); t.tabIndex = on ? 0 : -1; if (on) ti = n; });
+  panes.forEach(function(p){ p.classList.toggle('on', p.id === 'p-' + k); });
+  dia.setAttribute('data-focus', k); con.classList.toggle('run', k === 'run');
+  if (window.gsap && !reduce) gsap.fromTo('#scan', {attr:{x:150}, opacity:.5}, {attr:{x:706}, opacity:0, duration:.95, ease:'power2.inOut', overwrite:true});
+  if (fromUser){ auto = false; clearInterval(autoTimer); progWrap.classList.add('stop'); bar.classList.remove('run'); }
+  else if (auto){ bar.classList.remove('run'); void bar.offsetWidth; bar.classList.add('run'); }
+  if (window.gsap && !reduce){ var pane = document.getElementById('p-' + k); gsap.fromTo(pane.children, {y:18, opacity:0}, {y:0, opacity:1, duration:.6, ease:'expo.out', stagger:.05, overwrite:true}); }
+}
+tabs.forEach(function(t, n){
+  t.addEventListener('click', function(){ select(t.getAttribute('data-k'), true); });
+  t.addEventListener('keydown', function(e){
+    var m = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0; if (!m) return;
+    e.preventDefault(); var nt = tabs[(n + m + tabs.length) % tabs.length]; nt.focus(); select(nt.getAttribute('data-k'), true);
+  });
+});
+select('cloud', false);
+if (auto){
+  var rotating = false;
+  var startAuto = function(){ if (rotating || !auto) return; rotating = true; select(tabs[ti].getAttribute('data-k'), false);
+    autoTimer = setInterval(function(){ if (!auto) return; ti = (ti + 1) % tabs.length; select(tabs[ti].getAttribute('data-k'), false); }, 6000); };
+  if ('IntersectionObserver' in window) new IntersectionObserver(function(e){ if (e[0].isIntersecting) startAuto(); }, {threshold:.35}).observe(document.querySelector('.plat-grid')); else startAuto();
+}
+
+/* inclinaison du schéma */
+if (fine && !reduce && window.gsap){
+  var rx = gsap.quickTo(con, 'rotationX', {duration:.9, ease:'power3'}), ry = gsap.quickTo(con, 'rotationY', {duration:.9, ease:'power3'});
+  gsap.set(con, {transformPerspective:1400});
+  con.addEventListener('mousemove', function(e){ var r = con.getBoundingClientRect(); rx(((e.clientY - r.top) / r.height - .5) * -4); ry(((e.clientX - r.left) / r.width - .5) * 6); });
+  con.addEventListener('mouseleave', function(){ rx(0); ry(0); });
+}
+
+
+/* =================== scénario au défilement =================== */
+var steps = [].slice.call(document.querySelectorAll('.step')), bars = [].slice.call(document.querySelectorAll('.dots b'));
+var stepShapes = ['si', 'strates', 'regle'], curStep = -1;
+function splitWords(el){
+  var words = el.textContent.split(' '); el.textContent = '';
+  words.forEach(function(w, i){
+    var o = document.createElement('span'), inn = document.createElement('span');
+    o.className = 'wd'; inn.textContent = w; o.appendChild(inn); el.appendChild(o);
+    if (i < words.length - 1) el.appendChild(document.createTextNode(' '));
+  });
+}
+if (window.gsap && window.ScrollTrigger && !reduce){
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* défilement fluide (souris et pavé tactile) */
+  var lenis = null;
+  if (window.Lenis && fine){
+    lenis = new Lenis({lerp:.1});
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add(function(t){ lenis.raf(t * 1000); });
+    gsap.ticker.lagSmoothing(0);
+    [].slice.call(document.querySelectorAll('a[href^="#"]')).forEach(function(a){
+      a.addEventListener('click', function(e){
+        var id = a.getAttribute('href'), t = id.length > 1 ? document.querySelector(id) : null;
+        if (!t) return; e.preventDefault(); lenis.scrollTo(t, {offset:id === '#top' ? 0 : -60, duration:1.6});
+      });
+    });
+  }
+
+  [].slice.call(document.querySelectorAll('.sec-title, .contact h2, .step h2')).forEach(splitWords);
+
+  /* intro : la graduation se remplit, ses points s'envolent et forment le nuage */
+  var introEl = document.querySelector('.intro'), introDone = false;
+  function startHero(){
+    gsap.from('h1 .kick', {y:18, opacity:0, duration:.9, ease:'expo.out', delay:.05});
+    gsap.from('h1 .ln>span', {yPercent:112, duration:1.3, ease:'expo.out', stagger:.12, delay:.12});
+    gsap.from('.hero .lead, .hero .cta', {y:22, opacity:0, duration:1, ease:'expo.out', stagger:.1, delay:.45});
+    gsap.from('.hd', {yPercent:-100, duration:1, ease:'expo.out', delay:.3});
+  }
+  function endIntro(){
+    if (introDone) return; introDone = true;
+    var r = introEl.querySelector('.intro-ruler').getBoundingClientRect();
+    for (var i = 0; i < N; i++){
+      var p = P[i], u = Math.random(), onCur = Math.random() < .45, x, y;
+      if (onCur){ x = r.left + u * r.width; y = r.bottom - Math.random() * 4; }
+      else { var t = Math.round(u * 40), major = t % 10 === 0; x = r.left + t / 40 * r.width + (Math.random() - .5); y = r.bottom - Math.random() * (major ? 18 : 8); }
+      p.x = x - cam.cx; p.y = y - cam.cy; p.z = 0; p.vx = p.vy = p.vz = 0; p.a = 1; p.red = onCur;
+    }
+    gsap.to(introEl, {opacity:0, duration:.3, ease:'power1.out', onComplete:function(){ document.documentElement.classList.remove('js-intro'); introEl.style.display = 'none'; }});
+    setShape('cloud'); startHero();
+  }
+  if (document.documentElement.classList.contains('js-intro')){
+    var cnt = {v:0}, num = introEl.querySelector('.intro-n'), bar0 = introEl.querySelector('.intro-ruler i');
+    if (lenis) lenis.stop();
+    gsap.timeline({onComplete:function(){ if (lenis) lenis.start(); endIntro(); }})
+      .to(cnt, {v:100, duration:1.3, ease:'power2.inOut', onUpdate:function(){ num.textContent = String(Math.round(cnt.v)).padStart(3, '0'); }}, 0)
+      .to(bar0, {scaleX:1, duration:1.3, ease:'power2.inOut'}, 0);
+    setTimeout(function(){ if (lenis) lenis.start(); endIntro(); }, 4200);
+  } else { setShape('cloud'); startHero(); }
+
+  /* sortie de l'accueil : les deux lignes du titre se séparent */
+  var lns = document.querySelectorAll('h1 .ln');
+  gsap.to(lns[0], {xPercent:-9, ease:'none', scrollTrigger:{trigger:'.hero', start:'top top', end:'bottom top', scrub:true}});
+  gsap.to(lns[1], {xPercent:14, ease:'none', scrollTrigger:{trigger:'.hero', start:'top top', end:'bottom top', scrub:true}});
+  gsap.to('.hero-text', {opacity:0, yPercent:-8, ease:'none', scrollTrigger:{trigger:'.hero', start:'25% top', end:'85% top', scrub:true}});
+
+  /* démarche : chaque étape fait exploser la forme précédente */
+  function showStep(i){
+    var prev = curStep; curStep = i;
+    burst(cam.cx, cam.cy, prev === -1 ? 10 : 18, 520); agit = 1;
+    setShape(stepShapes[i]);
+    steps.forEach(function(s, k){ s.classList.toggle('on', k === i); });
+    var st = steps[i];
+    gsap.fromTo(st.querySelectorAll('.wd > span'), {yPercent:110}, {yPercent:0, duration:.85, ease:'expo.out', stagger:.035, overwrite:true});
+    gsap.fromTo([st.querySelector('.step-k'), st.querySelector('p:not(.step-k)'), st.querySelector('ul')], {y:24, opacity:0}, {y:0, opacity:1, duration:.7, ease:'expo.out', stagger:.07, delay:.1, overwrite:true});
+  }
+  ScrollTrigger.create({trigger:'.steps', start:'top 62%', end:'top top',
+    onEnter:function(){ if (curStep === -1){ burst(cam.cx, cam.cy, 14, 520); agit = 1; setShape('si'); } },
+    onLeaveBack:function(){ curStep = -1; burst(cam.cx, cam.cy, 10, 520); setShape('cloud'); }});
+  ScrollTrigger.create({trigger:'.steps', start:'top top', end:'+=260%', pin:true, anticipatePin:1,
+    onUpdate:function(self){
+      var pr = self.progress * 3, i = Math.min(2, Math.floor(pr));
+      bars.forEach(function(b, k){ b.style.transform = 'scaleX(' + Math.max(0, Math.min(1, pr - k)) + ')'; });
+      if (i !== curStep) showStep(i);
+    },
+    onLeave:function(){ curStep = -1; },
+    onLeaveBack:function(){ curStep = -1; setShape('si'); }});
+  [].slice.call(document.querySelectorAll('[data-shape]')).forEach(function(sec){
+    var go = function(){ var sh = sec.getAttribute('data-shape'); if (sh === 'cloudEnd' && current !== 'cloudEnd'){ burst(cam.cx, cam.cy, 12, 600); agit = 1; } setShape(sh); };
+    ScrollTrigger.create({trigger:sec, start:'top 60%', end:'bottom 40%', onEnter:go, onEnterBack:go});
+  });
+
+  /* titres : les mots montent derrière un masque */
+  [].slice.call(document.querySelectorAll('.sec-title, .contact h2')).forEach(function(t){
+    gsap.from(t.querySelectorAll('.wd > span'), {yPercent:110, duration:1.15, ease:'expo.out', stagger:.05, scrollTrigger:{trigger:t, start:'top 86%', once:true}});
+  });
+
+  /* rideau : la plateforme monte sur le champ de particules, le schéma se pose */
+  gsap.fromTo('.plat', {clipPath:'inset(9% 4% 0% 4% round 48px 48px 0px 0px)'}, {clipPath:'inset(0% 0% 0% 0% round 0px 0px 0px 0px)', ease:'none',
+    scrollTrigger:{trigger:'.plat', start:'top bottom', end:'top 18%', scrub:true}});
+  gsap.set('.console-wrap', {transformPerspective:1600});
+  gsap.fromTo('.console-wrap', {rotationX:50, yPercent:14, scale:.86, opacity:.6}, {rotationX:0, yPercent:0, scale:1, opacity:1, ease:'none',
+    scrollTrigger:{trigger:'.plat-grid', start:'top bottom', end:'top 52%', scrub:.4}});
+  var groups = document.querySelectorAll('.dia .g');
+  gsap.from(groups, {y:-28, opacity:0, duration:.8, ease:'back.out(1.6)', stagger:.09,
+    scrollTrigger:{trigger:'.plat-grid', start:'top 55%', once:true},
+    onStart:function(){ gsap.set(groups, {transition:'none'}); },
+    onComplete:function(){ gsap.set(groups, {clearProps:'opacity,transform,transition'}); }});
+  gsap.from('.explore', {y:40, opacity:0, duration:1.2, ease:'expo.out', scrollTrigger:{trigger:'.plat-grid', start:'top 72%', once:true}});
+
+  /* modes d'engagement : les blocs basculent en place */
+  gsap.from('.mode', {y:70, rotationX:-28, transformPerspective:900, transformOrigin:'50% 0%', opacity:0, duration:1.2, ease:'expo.out', stagger:.12,
+    scrollTrigger:{trigger:'.modes-grid', start:'top 84%', once:true}});
+
+  /* références : typographie cinétique, vitesse et inclinaison suivent le défilement */
+  var rows = [].slice.call(document.querySelectorAll('.kin-row')), xs = rows.map(function(){ return 0; }), vel = 0, lastY = 0;
+  ScrollTrigger.create({start:0, end:'max', onUpdate:function(self){
+    vel = self.getVelocity(); agit = Math.max(agit, Math.min(1, Math.abs(vel) / 4500));
+    var y = self.scroll();
+    if (y > 160 && y > lastY + 6) hd.classList.add('away'); else if (y < lastY - 6 || y < 160) hd.classList.remove('away');
+    lastY = y;
+  }});
+  gsap.ticker.add(function(t, dt){
+    var f = dt / 16.67, boost = Math.min(24, Math.abs(vel) / 100), sk = Math.max(-12, Math.min(12, vel / 300));
+    rows.forEach(function(r, i){
+      var dir = i % 2 ? 1 : -1, half = r.scrollWidth / 2;
+      xs[i] += dir * (.9 + boost) * f;
+      if (xs[i] <= -half) xs[i] += half; if (xs[i] > 0) xs[i] -= half;
+      r.style.transform = 'translate3d(' + xs[i].toFixed(1) + 'px,0,0) skewX(' + (-dir * sk).toFixed(2) + 'deg)';
+    });
+    vel *= .9;
+  });
+
+  /* curseur, boutons magnétiques, onde de choc au clic */
+  if (fine){
+    var cdot = document.querySelector('.cur-dot'), cring = document.querySelector('.cur-ring'), shown = false, rx2 = -100, ry2 = -100;
+    window.addEventListener('mousemove', function(e){ if (!shown){ shown = true; rx2 = e.clientX; ry2 = e.clientY; document.body.classList.add('has-cur'); } });
+    document.addEventListener('mouseleave', function(){ document.body.classList.remove('has-cur'); shown = false; });
+    document.addEventListener('mouseover', function(e){ document.body.classList.toggle('cur-big', !!e.target.closest('a, button')); });
+    gsap.ticker.add(function(){
+      rx2 += (mouse.x - rx2) * .2; ry2 += (mouse.y - ry2) * .2;
+      cdot.style.transform = 'translate(' + mouse.x + 'px,' + mouse.y + 'px)'; cring.style.transform = 'translate(' + rx2.toFixed(1) + 'px,' + ry2.toFixed(1) + 'px)';
+    });
+    [].slice.call(document.querySelectorAll('.btn')).forEach(function(b){
+      var qx = gsap.quickTo(b, 'x', {duration:.5, ease:'power3'}), qy = gsap.quickTo(b, 'y', {duration:.5, ease:'power3'});
+      b.addEventListener('mousemove', function(e){ var r = b.getBoundingClientRect(); qx((e.clientX - (r.left + r.width / 2)) * .3); qy((e.clientY - (r.top + r.height / 2)) * .3); });
+      b.addEventListener('mouseleave', function(){ gsap.to(b, {x:0, y:0, duration:.9, ease:'elastic.out(1,.4)'}); });
+    });
+    window.addEventListener('pointerdown', function(e){
+      if (!fieldOn || e.button !== 0 || e.target.closest('a, button, .plat, .modes, .refs, footer, .hd')) return;
+      burst(e.clientX, e.clientY, 34, 230); agit = Math.max(agit, .6);
+      var sh = document.createElement('div'); sh.className = 'shock'; sh.style.left = e.clientX + 'px'; sh.style.top = e.clientY + 'px'; document.body.appendChild(sh);
+      gsap.fromTo(sh, {scale:.2, opacity:1}, {scale:9, opacity:0, duration:.9, ease:'expo.out', onComplete:function(){ sh.remove(); }});
+    });
+  }
+} else {
+  document.documentElement.classList.remove('js-intro');
+  document.body.classList.add('static');
+  if (!reduce) setShape('cloud');
+}
+})();
+</script>
+</body>
+</html>
