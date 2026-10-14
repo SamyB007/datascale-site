@@ -1,12 +1,12 @@
 # datascale.fr
 
-Site vitrine de DATA SCALE — HTML statique, charte v2.2, hébergé sur GitHub Pages. Intro animée, accueil en particules (canvas), schéma vivant de la plateforme en quatre couches (SVG), défilement fluide et animations au scroll (GSAP, ScrollTrigger, Lenis, hébergés dans `assets/js/`).
+Site vitrine de DATA SCALE — HTML statique, charte v2.2, hébergé sur GitHub Pages. Héros avec console animée (cadrage, build, run), menu des offres, cartes illustrées (IA, flux de données, maturité, journal d'accès), schéma des quatre couches qui se défont en particules pour former le logo, mur des technologies, questions fréquentes. Défilement fluide et animations au scroll : GSAP, ScrollTrigger et Lenis, hébergés dans `assets/js/`.
 
 ## Contenu du dépôt
 
 | Fichier | Rôle |
 | --- | --- |
-| `index.html` | Page d'accueil (one-page) : démarche, plateforme (Cloud, Data, IA, Run), modes d'engagement, références, contact |
+| `index.html` | Page d'accueil (one-page) : héros, références, IA, contrôle des données, plateforme en quatre couches, engagement, démarche, pourquoi DATA SCALE, stack, questions, contact |
 | `mentions-legales.html` | Mentions légales |
 | `404.html` | Page introuvable |
 | `CNAME` | Domaine personnalisé `datascale.fr` (ne pas supprimer) |
@@ -61,4 +61,21 @@ Vérification : `dig datascale.fr +short` doit renvoyer les quatre adresses 185.
 
 ## Mettre à jour le contenu
 
-Tout le contenu est dans `index.html` (texte en clair, une section par bloc `<section>`). Les offres de chaque couche sont dans les panneaux `p-cloud`, `p-data`, `p-ia` et `p-run` ; les références dans le bloc `.wall`. Aucune compilation nécessaire.
+Tout le contenu est dans `index.html`, une balise `<section id="…">` par bloc :
+
+| Section | Contenu |
+| --- | --- |
+| `top` | Héros : titre, onglets Cadrage, Build, Run et console d'exemple |
+| `clients` | Bandeau des références (noms des clients) |
+| `ia` | Data apps et IA : cadre IA, agents encadrés, data app |
+| `controle` | Flux de données, maturité sur 7 axes, journal des accès |
+| `plateforme` | Les quatre couches et leurs offres (panneaux `.st-step`) |
+| `marque` | Les couches qui forment le logo, phrase de marque |
+| `engagement` | Au forfait, centre de services, renfort |
+| `demarche` | Cadrage, build, run |
+| `pourquoi` | Les trois différenciateurs |
+| `stack` | Mur des technologies : une technologie par `<li class="n">Nom<em>Domaine</em></li>` |
+| `questions` | Questions fréquentes |
+| `contact` | Adresse, LinkedIn |
+
+Le menu Offres (`#mm`), le menu mobile (`#menu`) et le pied de page listent les familles et les offres. Aucune compilation nécessaire.
